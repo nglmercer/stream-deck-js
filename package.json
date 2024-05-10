@@ -1,0 +1,41 @@
+{
+  "author": "melser",
+  "name": "streamdeck",
+  "productName": "streamdeck",
+  "version": "1.0.0",
+  "description": "streamdeck",
+  "main": "index.js",
+  "scripts": {
+    "start": "electron .",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish --release",
+    "lint": "echo \"No linting configured\""
+  },
+  "keywords": [],
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^16.4.4",
+    "electron-drag": "^2.0.0",
+    "electron-log": "^5.1.2",
+    "electron-reload": "^2.0.0-alpha.1",
+    "electron-squirrel-startup": "^1.0.0",
+    "electron-store": "^8.2.0",
+    "express": "^4.18.2",
+    "js-yaml": "^4.1.0",
+    "node-osc": "^9.1.0",
+    "obs-websocket-js": "^5.0.5",
+    "socket.io": "^4.7.4",
+    "update-electron-app": "^3.0.0"
+  },
+  "devDependencies": {
+    "@electron-forge/cli": "^7.4.0",
+    "@electron-forge/maker-deb": "^7.2.0",
+    "@electron-forge/maker-rpm": "^7.2.0",
+    "@electron-forge/maker-squirrel": "^7.2.0",
+    "@electron-forge/maker-zip": "^7.2.0",
+    "@electron-forge/plugin-auto-unpack-natives": "^7.2.0",
+    "@electron-forge/publisher-github": "^7.3.1",
+    "electron": "^28.3.1"
+  }
+}

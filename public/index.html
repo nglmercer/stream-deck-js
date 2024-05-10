@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>
+            GatoDeck
+        </title>
+        <meta lang="e">
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
+        <script src="mousetrap.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="output.css" rel="stylesheet">
+<!--    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css">
+-->
+    </head>
+    <body class="bg-sky-600 dark:bg-purple-800 text-cyan-50">
+        
+        <div class="title-div" >
+            <h1 class="title-web">GatoDeck</h1>
+        </div>
+        <form id="obsForm" class="flex items-center justify-center">
+          <label for="localhost">Host:</label>
+          <input type="text" id="localhost" name="localhost" value="localhost" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
+  
+          <label for="port">Puerto:</label>
+          <input type="text" id="port" name="port" value="4455" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
+  
+          <label for="password">Contraseña:</label>
+          <input type="text" id="password" name="password" value="123456" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
+  
+          <button type="submit">Conectar a OBS</button>
+      </form>
+        <div id="btn-scenes" class="">
+        </div>
+        <script>
+          // single keys
+        
+          Mousetrap.bind('4', function() { console.log('4'); });
+          Mousetrap.bind("?", function() { console.log('show shortcuts!'); });
+          Mousetrap.bind('esc', function() { console.log('escape'); }, 'keyup');
+      
+          // combinations
+          Mousetrap.bind('command+shift+k', function() { console.log('command shift k'); });
+      
+          // map multiple combinations to the same callback
+          Mousetrap.bind(['command+k', 'ctrl+k'], function() {
+              console.log('command k or control k');
+      
+              // return false to prevent default browser behavior
+              // and stop event from bubbling
+              return false;
+          });
+      
+          // gmail style sequences
+          Mousetrap.bind('g i', function() { console.log('go to inbox'); });
+          Mousetrap.bind('* a', function() { console.log('select all'); });
+      
+          // konami code!
+          Mousetrap.bind('up up down down left right left right b a enter', function() {
+              console.log('konami code');
+          });
+      </script>
+        <div class="div-btn">
+            <button id="btn-copy" class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">Copiar</button>
+            <button id="btn-page"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">Pegar</button>
+            <button id="btn-paper"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">Paper</button>
+            <button id="btn-Recording"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">OBS Recording</button>
+            <button id="btn-volume-down"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">🔉-</button>
+            <button id="btn-previous"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">|◀◀</button>
+            <button id="btn-play/pause"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">▶||</button>
+            <button id="btn-next"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">▶▶|</button>
+            <button id="btn-volume-up"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">🔊+</button>
+            <button id="btn-volume-mute"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">🔇</button>
+
+            <div id="resp" ></div>
+            <div id="OBSVersion"></div>
+            <div id="buttonDataContainer"></div>
+            <!-- 
+            <input type="text" id="textInput">
+            <button id="buttonDatasend">Enviar</button>
+            -->
+            <div id="programasContainer"></div>
+
+            
+            <div id="editModeButton">
+                <input type="checkbox" id="toggleCheckboxes" class="hidden peer">
+                <label for="toggleCheckboxes" class=" min-w-5 max-w-20 max-h-20 inline-flex items-start pr-4 justify-between text-white bg-sky-200 border-2 border-gray-200 rounded-lx cursor-pointer dark:hover:text-gray-300 dark:border-sky-500 peer-checked:border-blue-600 hover:text-gray-900 peer-checked:bg-red-700 dark:peer-checked:text-white peer-checked:text-white dark:text-white dark:bg-sky-500 my-2" >Modo Editor </label>
+            <div id="keyboardButtons" class="flex items-center justify-center py-4 md:py-8 flex-wrap">
+            <div id="keyboardSelect"></div>
+            <button type="button" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lx m-2" id="openModalButton">Añadir atajos</button>
+
+            <div class="fixed w-max z-10 inset-0 overflow-y-auto hidden" id="keyboardModal">
+              <div class="flex items-center justify-center">
+                <div class="bg-black/25 bg-blur w-lvw p-10 rounded-lx shadow-lg">
+                  <div class="flex justify-between items-center mb-4">
+                    <h5 class="text-lg font-semibold bg-purple-600 rounded-lx" id="keyboardModalLabel">Seleccionar teclas</h5>
+                    <button type="button" class="bg-red-800 w-20 text-white text-xl hover:text-gray-800" id="closeModalButton" aria-label="Close">
+                      Cerrar
+                    </button>
+                  </div>
+                  <div id="keyboardListContainer"></div>
+                  <div class="mt-6 flex justify-center">
+                    <button type="button" class="mr-4 py-2 px-4 bg-purple-400-800 hover:bg-gray-300 rounded-lx m-2" id="closeModalButton">Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+        <script src="/api.js"></script>
+        <script src="/socketio_connect.js"></script>
+        <script src="/Modal.js"></script>
+    </body>
+</html>

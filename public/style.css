@@ -1,0 +1,141 @@
+:root {
+    --color-dark-morado: rgb(75, 0, 130);
+    --color-ligth-morado: rgb(106, 90, 205);
+    --color-dark-add-morado: rgb(46, 8, 84);
+    --color-dark-gris: rgb(173, 73, 219);
+    --color-ligth-gris: rgb(211, 211, 211);
+    --color-dark-add-gris: rgb(85, 85, 85);
+    --color-text: white;
+    --color-1: rgb(169, 104, 255);
+    --color-2: rgb(115, 13, 251);
+    --color-3: rgb(74, 1, 171);
+    --color-4: rgb(46, 2, 104);
+    --color-5: rgb(0, 0, 1);
+    --color-6: rgb(2 132 199);
+    --color-7: rgb(0, 148, 223);  
+    --color-8:rgb(47, 158, 214);
+}
+
+.clic-boton {
+  background-color: var(--color-8); 
+  margin: 0.5rem;
+}
+body {
+    background-color: var(--color-4);
+    width: 100dvw; /* 80% del ancho de la ventana */
+    height: 40dvh; /* 60% de la altura de la ventana */
+    color: var(--color-text);
+}
+button {
+    color: var(--color-ligth-gris);
+    background-color: var(--color-6);
+    border-radius: 17px;
+    padding: 10px;
+    font-size: 2rem;
+    margin: 10px;
+    width: 10rem;
+    border: 2px solid rgba(var(--color-1), 0.1);
+    /* box-shadow: inset 0px 5px 20px 3px rgba(0,0,0,0.75), 0px 5px 20px 3px rgba(0, 0, 0, 0.5), 0px -5px 20px 3px rgba(247, 247, 247, 0.4); Ancho, Alto, Radio Sombra, Radio Propagracion */
+    box-shadow: inset 0px -5px 5px -1px rgba(255, 255, 255, 0.4), inset 0px 5px 5px -1px rgba(78, 78, 78, 0.4), 0px 5px 5px 3px rgba(78, 78, 78, 0.5), 0px -5px 5px 3px rgba(73, 73, 73, 0.4); /* Ancho, Alto, Radio Sombra, Radio Propagracion */
+    min-height: 4rem;
+    text-wrap: auto;
+}
+.custom-bg-color {
+    background-color: var(--color-dark-morado);
+    color: var(--color-text);
+}
+.delete-button {
+    background-color: red;
+    height: 45px;
+}
+button:hover {
+    color: var(--color-1);
+    background-color: var(--color-3);
+}
+.title-web {
+    color: var(--color-text);
+}
+.title-div {
+    text-align: center;
+}
+.div-btn {
+    text-align: center;
+}
+#btn-scenes {
+    text-align: center;
+    margin: 10px;
+}
+.modal {
+    display: none; /* Initially hidden */
+    position: fixed; /* Stay in place */
+    z-index: 1000; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.4); /* Transparent black background */
+  }
+  
+  .modal-dialog {
+    position: relative; /* Center the modal content */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content; /* Allow responsive sizing */
+    margin: auto;
+    animation: modal-show 0.3s ease-in-out forwards; /* Animation for modal open */
+  }
+  
+  @keyframes modal-show {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal-content {
+    margin: 15px; /* Add some margin */
+    padding: 20px;
+    border: 1px solid #888; /* 1px grey border */
+    border-radius: 5px; /* Rounded corners */
+    animation: modal-fade 0.3s ease-in-out forwards; /* Animation for modal content fade */
+  }
+  
+  @keyframes modal-fade {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #e7e7e7; /* Light grey bottom border */
+  }
+  
+  .modal-title {
+    margin-bottom: 0; /* Remove default bottom margin */
+  }
+  
+  .close {
+    color: #fff; /* White text */
+    background-color: #007bff; /* Blue background */
+    opacity: 0.8; /* Semi-transparent */
+    padding: 0.5rem 0.75rem; /* Padding */
+    border: none;
+    border-radius: 0.25rem; /* Rounded corners */
+    cursor: pointer; /* Hand cursor on hover */
+  }
+  
+  .close:hover, .close:focus {
+    opacity: 1; /* Full opacity on hover/focus */
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end; /* Buttons at the end */
+    border-top: 1px solid #e7e7e7; /* Light grey top border */
+  }
+  
+  .btn {
+    margin: 5px; /* Add some margin between buttons */
+  }
