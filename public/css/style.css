@@ -1,0 +1,109 @@
+:root {
+    --color-dark-morado: rgb(75, 0, 130);
+    --color-ligth-morado: rgb(106, 90, 205);
+    --color-dark-add-morado: rgb(46, 8, 84);
+    --color-dark-gris: rgb(173, 73, 219);
+    --color-ligth-gris: rgb(211, 211, 211);
+    --color-dark-add-gris: rgb(85, 85, 85);
+    --color-text: white;
+    --color-1: rgb(169, 104, 255);
+    --color-2: rgb(115, 13, 251);
+    --color-3: rgb(74, 1, 171);
+    --color-4: rgb(46, 2, 104);
+    --color-5: rgb(0, 0, 1);
+    --color-6: rgb(2 132 199);
+    --color-7: rgb(0, 148, 223);  
+    --color-8:rgb(47, 158, 214);
+
+}
+
+.clic-boton {
+  background-color: var(--color-8); 
+  margin: 0.5rem;
+}
+body {
+    background-color: var(--color-4);
+    color: var(--color-text);
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+button {
+    color: var(--color-ligth-gris);
+    background-color: var(--color-6);
+    border-radius: 17px;
+    padding: 10px;
+    font-size: 2rem;
+    margin: 10px;
+    width: 10rem;
+    border: 2px solid rgba(var(--color-1), 0.1);
+    /* box-shadow: inset 0px 5px 20px 3px rgba(0,0,0,0.75), 0px 5px 20px 3px rgba(0, 0, 0, 0.5), 0px -5px 20px 3px rgba(247, 247, 247, 0.4); Ancho, Alto, Radio Sombra, Radio Propagracion */
+    box-shadow: inset 0px -5px 5px -1px rgba(255, 255, 255, 0.4), inset 0px 5px 5px -1px rgba(78, 78, 78, 0.4), 0px 5px 5px 3px rgba(78, 78, 78, 0.5), 0px -5px 5px 3px rgba(73, 73, 73, 0.4); /* Ancho, Alto, Radio Sombra, Radio Propagracion */
+    min-height: 4rem;
+    text-wrap: auto;
+}
+.custom-bg-color {
+    background-color: var(--color-dark-morado);
+    color: var(--color-text);
+}
+.delete-button {
+    background-color: red;
+    height: 45px;
+}
+button:hover {
+    color: var(--color-1);
+    background-color: var(--color-3);
+}
+.title-web {
+    color: var(--color-text);
+}
+.title-div {
+    text-align: center; 
+}
+
+  .parent {
+    display: grid;
+    grid-template-columns: auto 1fr; /* Menú ocupa auto, contenido ocupa el espacio restante */
+    grid-template-rows: auto 1fr auto; /* Navbar ocupa auto, contenido ocupa el espacio restante, footer ocupa auto */
+    grid-column-gap: 0px;
+    grid-row-gap: 0px;
+    width: 100vw;
+    height: 100dvh;
+    grid-template-areas: 
+      "navbar navbar"
+      "menu content"
+      "footer footer"; /* Define explícitamente las áreas */
+  }
+  .divnavbar {
+    grid-area: navbar; /* Asignar área 'navbar' */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 2rem; /* Puedes ajustar la altura según sea necesario */
+  }
+  
+  .divmenu {
+    position: relative;
+    grid-area: menu; /* Asignar área 'menu' */
+    transition: width 0.3s; /* Transición suave para el cambio de ancho */
+    min-height: 0; /* Asegurar que el menú no empuje el footer fuera del viewport */
+  }
+  
+  .divcontent {
+    position: relative;
+    grid-area: content; /* Asignar área 'content' */
+    width: 100%;
+    min-height: 0; /* Asegurar que el contenido no empuje el footer fuera del viewport */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Permitir el scroll si el contenido es demasiado alto */
+  }
+  
+  .divfooter {
+    grid-area: footer; /* Asignar área 'footer' */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 50px; /* Puedes ajustar la altura según sea necesario */
+  }
+  

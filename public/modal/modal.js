@@ -1,7 +1,6 @@
 // ModalModule.js
 import { DataParser, DataParserStructured } from './dataparser.js';
 import {createImageSelector}  from './imageSelector.js';
-import { fetchTranslationData, getTranslationValue } from '../getdata/translate.js';
 export class ModalModule {
     constructor(buttonClass, htmlPath, cssPath, setupCallback, dataCallback, onOpenCallback) {
         this.buttonClass = buttonClass;
@@ -146,37 +145,6 @@ export class ModalModule {
     captureData(options = {}) {
         const parser = new DataParserStructured(this.modal, options);
         return parser.parseStructured();
-    }
-    async translateModal(lang) {
-        if (!this.modal) {
-            console.error('Modal not initialized');
-            return;
-        }
-    
-        try {
-            const data = await fetchTranslationData();
-            if (data) {
-                this.translateElementsInModal('[data-translate]', data, lang);
-                this.translateElementsInModal('[id]', data, lang);
-                this.translateElementsInModal('[class]', data, lang);
-            }
-        } catch (error) {
-            console.error('Error translating modal:', error);
-        }
-    }
-    
-    translateElementsInModal(selector, data, lang) {
-        const elements = this.modal.querySelectorAll(selector);
-        elements.forEach(element => {
-            const key = element.getAttribute('data-translate') || element.id || element.className;
-            const translation = getTranslationValue(data, lang, key);
-            if (translation) {
-                element.innerHTML = translation;
-            }
-        });
-    }
-    async changeModalLanguage(lang) {
-        await this.translateModal(lang);
     }
 }
 class CustomSelector {
