@@ -9,12 +9,16 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="./css/style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
-        <script src="mousetrap.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="./css/output.css" rel="stylesheet">
-<!--    <link rel="stylesheet" href="{{ url_for('static', filename='css/output.css">
--->
+    <script src="./index.js" type="module"></script>
+    <style>
+      button {
+        background-color: green !important;
+        background: green !important;
+      }
+    </style>
     </head>
     <body class="bg-sky-600 dark:bg-purple-800 text-cyan-50">
         
@@ -24,7 +28,9 @@
             <h1 class="title-web">GatoDeck</h1>
         </div>
         </div>
-        <div class="divmenu"></div>
+        <div class="divmenu">
+          <button id="openModal1" class="openModal1"> Abrir modal </button>
+        </div>
         <div class="divcontent">
           <form id="obsForm" class="grid grid-flow-dense gap-4 p-4">
             <label for="localhost">Host:</label>
@@ -40,34 +46,6 @@
         </form>
           <div id="btn-scenes" class="">
           </div>
-          <script>
-            // single keys
-          
-            Mousetrap.bind('4', function() { console.log('4'); });
-            Mousetrap.bind("?", function() { console.log('show shortcuts!'); });
-            Mousetrap.bind('esc', function() { console.log('escape'); }, 'keyup');
-        
-            // combinations
-            Mousetrap.bind('command+shift+k', function() { console.log('command shift k'); });
-        
-            // map multiple combinations to the same callback
-            Mousetrap.bind(['command+k', 'ctrl+k'], function() {
-                console.log('command k or control k');
-        
-                // return false to prevent default browser behavior
-                // and stop event from bubbling
-                return false;
-            });
-        
-            // gmail style sequences
-            Mousetrap.bind('g i', function() { console.log('go to inbox'); });
-            Mousetrap.bind('* a', function() { console.log('select all'); });
-        
-            // konami code!
-            Mousetrap.bind('up up down down left right left right b a enter', function() {
-                console.log('konami code');
-            });
-        </script>
           <div class="div-btn">
             <button id="btn-copy" class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">Copiar</button>
             <button id="btn-page"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">Pegar</button>

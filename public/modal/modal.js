@@ -122,7 +122,6 @@ export class ModalModule {
             }
             // Inicializar los selectores personalizados
             Object.values(this.customSelectors).forEach(selector => selector.initialize());
-            await this.translateModal(lang);
             // Ejecutar la acción personalizada si se proporciona
             if (typeof customAction === 'function') {
                 await customAction(this);
@@ -157,6 +156,7 @@ class CustomSelector {
         this.referenceImage = null;
         this.isOpen = false;
         this.isInitialized = false;
+        this.customClass = options.customClass || ''; // Nueva: clase CSS personalizada
     }
 
     initialize() {
@@ -166,6 +166,19 @@ class CustomSelector {
         this.createReferenceImage();
         this.addEventListeners();
         this.isInitialized = true;
+    }
+
+    createSelectorElement() {
+        this.selectorElement = document.createElement('div');
+        this.selectorElement.className = `custom-selector ${this.customClass}`.trim();
+        this.selectorElement.style.display = 'none';
+        this.selectorElement.innerHTML = `
+            <h2>${this.options.title || 'Seleccionar'}</h2>
+            <div id="custom-options-${this.options.id}"></div>
+        `;
+        
+        const button = this.modalElement.querySelector(`#${this.options.id}-button`);
+        button.parentNode.insertBefore(this.selectorElement, button.nextSibling);
     }
 
     createSelectorButton() {
@@ -180,31 +193,6 @@ class CustomSelector {
         button.id = `${this.options.id}-button`;
         button.className = this.options.buttonClass;
         input.parentNode.insertBefore(button, input.nextSibling);
-    }
-
-    createSelectorElement() {
-        this.selectorElement = document.createElement('div');
-        this.selectorElement.className = 'custom-selector';
-        this.selectorElement.style.display = 'none';
-        this.selectorElement.innerHTML = `
-            <h2>${this.options.title || 'Seleccionar'}</h2>
-            <div id="custom-options-${this.options.id}"></div>
-        `;
-        
-        const button = this.modalElement.querySelector(`#${this.options.id}-button`);
-        button.parentNode.insertBefore(this.selectorElement, button.nextSibling);
-    }
-
-    createReferenceImage() {
-        this.referenceImage = document.createElement('img');
-        this.referenceImage.className = 'custom-selector-reference-image';
-        this.referenceImage.id = `${this.options.id}-reference-image`;
-        this.referenceImage.style.display = 'none';
-
-        const input = this.modalElement.querySelector(this.options.inputSelector);
-        // selectorDiv.insertBefore(this.referenceImage, this.selectorElement);
-        input.parentNode.insertBefore(this.referenceImage,  this.selectorElement);
-
     }
 
     addEventListeners() {
@@ -250,15 +238,24 @@ class CustomSelector {
         this.toggleSelector();
     }
 
+    createReferenceImage() {
+        this.referenceImage = document.createElement('img');
+        this.referenceImage.className = 'custom-selector-reference-image';
+        this.referenceImage.id = `${this.options.id}-reference-image`;
+        this.referenceImage.style.display = 'none';
+
+        const input = this.modalElement.querySelector(this.options.inputSelector);
+        input.parentNode.insertBefore(this.referenceImage, this.selectorElement);
+    }
+
     updateReferenceImage(item) {
-        console.log("updateReferenceImage", item);
         if (item && item.image) {
             this.referenceImage.src = item.image.url_list[0];
-            console.log(this.referenceImage);
             this.referenceImage.style.display = 'inline';
         } else {
             this.referenceImage.style.display = 'none';
         }
     }
 }
+/// aaaaaaaaaaaaaaaaaaaaaa
 // export {ModalModule};

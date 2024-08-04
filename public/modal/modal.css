@@ -22,14 +22,17 @@
 }
 
 .cerrarmodal,.cerrar {
-    color: #aaa;
+    position: absolute;
     right: 0;
-    float: left;
-    font-size: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    z-index: 1000;
-}
+  
+      color: #ff0000;
+      float: left;
+      font-size: 50px;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 1000;
+  
+  }
 .cerrarmodal:hover,
 .cerrarmodal:focus,
 .cerrar:hover,

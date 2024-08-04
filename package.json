@@ -15,6 +15,7 @@
   "keywords": [],
   "license": "MIT",
   "dependencies": {
+    "@nut-tree-fork/nut-js": "^4.2.2",
     "dotenv": "^16.4.4",
     "electron-drag": "^2.0.0",
     "electron-log": "^5.1.2",
