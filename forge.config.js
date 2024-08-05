@@ -13,7 +13,7 @@ module.exports = {
   ],
   packagerConfig: {
     asar: true,
-    // icon: './assets/icon.ico'
+    icon: './assets/icon.ico'
   },
   rebuildConfig: {},
   makers: [
@@ -22,9 +22,9 @@ module.exports = {
       config: {
         authors: 'melser',
         description: 'tiktok interactive app',
-        // options: {
-        //   icon: '/assets/icon.ico'
-        // }
+        options: {
+          icon: '/assets/icon.ico'
+        }
       }
     },
     {
@@ -33,11 +33,11 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-deb',
-      // config: {
-      //   options: {
-      //     icon: '/assets/icon.ico'
-      //   }
-      // }
+      config: {
+        options: {
+          icon: '/assets/icon.ico'
+        }
+      }
     },
     {
       name: '@electron-forge/maker-rpm',
