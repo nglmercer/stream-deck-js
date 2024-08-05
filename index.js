@@ -9,6 +9,8 @@ const PORT = process.env.PORT || 8081;
 const { mouseController, getKeyboardControlsAsJSONKey, keyboardController } = require('./keynut');
 const createServer = require('./server');
 const server = createServer();
+const qrcode = require('qrcode');
+const ip = require('ip');
 
 
 // server.use('/api', routes);
@@ -42,28 +44,20 @@ app.on('ready', () => {
       mainWindow.webContents.reload(); // Reload the page on F5
     }
   });
-  
-  async function initObs(url = 'ws://127.0.0.1:4455', password = '123456') {
-    try {
-        const {
-            obsWebSocketVersion,
-            negotiatedRpcVersion
-        } = await obs.connect(url, password, {
-            rpcVersion: 1
-        });
-        console.log(`Connected to server ${obsWebSocketVersion} (using RPC ${negotiatedRpcVersion})`);
-        io.emit('dataObs', obsWebSocketVersion);
-    } catch (error) {
-        console.error('Failed to connect', error.code, error.message);
-        io.emit('dataObs', obsWebSocketVersion); // obsWebSocketVersion no está definido en este ámbito
+      // Obtener la IP local
+  const localIP = ip.address();
+  const url = `http://${localIP}:${PORT}`;
+  qrcode.toDataURL(url, (err, url) => {
+    if (err) {
+      console.error('Error al generar el código QR:', err);
+      return;
     }
-  }
-
-  const obs = new OBSWebSocket();
+    mainWindow.webContents.send('qrcode', url);
+  });
+  console.log('URL del servidor:', url);
   // Iniciar el servidor HTTP
   server.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${PORT}`));
 
-  // updateHandler.initAutoUpdates();
 });
 //appready event
 function createWindow() {
@@ -111,3 +105,20 @@ ipcMain.handle('get-keyboard', async (event, arg) => {
 ipcMain.handle('parse-and-execute-key-command', async (event, arg) => {
   return keyboardController.parseAndExecuteKeyCommand(arg);
 });
+async function initObs(url = 'ws://127.0.0.1:4455', password = '123456') {
+  try {
+      const {
+          obsWebSocketVersion,
+          negotiatedRpcVersion
+      } = await obs.connect(url, password, {
+          rpcVersion: 1
+      });
+      console.log(`Connected to server ${obsWebSocketVersion} (using RPC ${negotiatedRpcVersion})`);
+      io.emit('dataObs', obsWebSocketVersion);
+  } catch (error) {
+      console.error('Failed to connect', error.code, error.message);
+      io.emit('dataObs', obsWebSocketVersion); // obsWebSocketVersion no está definido en este ámbito
+  }
+}
+
+const obs = new OBSWebSocket();

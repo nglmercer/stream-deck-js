@@ -24,10 +24,12 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.2.0",
     "express": "^4.18.2",
+    "ip": "^2.0.1",
     "loudness": "^0.4.2",
     "node-audio-volume-mixer": "^1.0.3",
     "node-osc": "^9.1.0",
     "obs-websocket-js": "^5.0.5",
+    "qrcode": "^1.5.3",
     "socket.io": "^4.7.4",
     "update-electron-app": "^3.0.0"
   },
