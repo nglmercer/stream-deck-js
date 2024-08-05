@@ -16,5 +16,6 @@ console.log("👋 Preload.js loaded successfully");
 // });
 const api = {
   getkeyboard: (arg) => ipcRenderer.invoke('get-keyboard', arg),
+  parseAndExecuteKeyCommand: (arg) => ipcRenderer.invoke('parse-and-execute-key-command', arg),
 }
 contextBridge.exposeInMainWorld("api", api);

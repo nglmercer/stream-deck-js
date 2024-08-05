@@ -10,6 +10,7 @@ import {     validateForm,
 import { svglist } from './svg/svgconst.js';
 import { fillForm } from './utils/formfiller.js';
 import { ButtonGrid } from './gridcontent/gridelements.js';
+// import { get } from '../routes.js';
 const streamcontrolsDBManager = createDBManager(databases.streamcontrols);
 let keyboardarray = [];
 let keyboardObject;
@@ -187,11 +188,13 @@ const streamcontrolstable = new TableManager('minecraft-tablemodal',
 
 streamcontrolstable.loadAndDisplayAllData();
 const buttonGrid = new ButtonGrid('buttonContainer', 100, 50, 5, 5);
-buttonGrid.addButtons([
-    { id: 'Button 1', text: 'Button 1', value: '1', callback: (value) => console.log(`Button ${value} clicked`) },
-    { id: 'Button 2', text: 'Button 2', value: '2', callback: (value) => console.log(`Button ${value} clicked`) },
-    // Agrega más botones según sea necesario
-]);
+// buttonGrid.addButtons([
+//     { id: 'Button 1', text: 'Button 1', value: '1', callback: (value) => console.log(`Button ${value} clicked`) },
+//     { id: 'Button 2', text: 'Button 2', value: '2', callback: (value) => console.log(`Button ${value} clicked`) },
+//     { id: 'Button 3', text: 'Button 3', value: '3', callback: (value) => console.log(`Button ${value} clicked`) },
+//     { id: 'Button 4', text: 'Button 4', value: '4', callback: (value) => console.log(`Button ${value} clicked`) },
+//     // Agrega más botones según sea necesario
+// ]);
 async function getdbdata() {
     try {
         const alldatabtManager = await streamcontrolsDBManager.getAllData();
@@ -208,10 +211,33 @@ function creategridbuttons(data) {
         id:  `${item.id}`,
         text: item.streamkeyselector.select,
         value: `${item.id}`,
-        callback: (value) => console.log(`Button ${item.streamkeyselector.select} clicked`)
-    }));
+        callback: (value) => {
+            sendtestevent(item.streamkeyselector.select);
+            console.log(`Button ${item.streamkeyselector.select}[${item.id}] clicked`)
+        }
+    }));//console.log(`Button ${item.streamkeyselector.select} clicked`)
     console.log('dataparsed', dataparsed);
     buttonGrid.addButtons(dataparsed);
 }
+async function sendtestevent(key) {
+    const idvalueboard = await getidfromvalueboard(key);
+    console.log("idvalueboard",idvalueboard);
+    window.api.parseAndExecuteKeyCommand(idvalueboard);
+}
+async function getidfromvalueboard(key) {
+    try {
+        const valueboardurl = "./datajson/valueboard.json"
+        const response = await fetch(valueboardurl);
+        const data = await response.json();
+        console.log('Fetched JSON valueboard:', data);
+        return data[key];
+    } catch (error) {
+        console.error('Error fetching JSON:', error);
+        return null;
+    }
+}
+getidfromvalueboard('Add').then(data => {
+    console.log("valueboard",data);
+});
 // Para activar/desactivar el modo de edición
 document.getElementById('toggleEditMode').addEventListener('click', () => buttonGrid.toggleEditMode());

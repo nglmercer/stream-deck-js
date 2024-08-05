@@ -50,46 +50,95 @@ const {
   
     return JSON.stringify(filteredControls, null, 2);
   }
-  
-console.log(getKeyboardControlsAsJSONKey());
+  // console.log(Key);
   const mouseController = new MouseController();
-  (async () => {
-    await keyboard.pressKey(Key.LeftControl, Key.C);
-    await keyboard.releaseKey(Key.LeftControl, Key.C);
-    const text = await clipboard.getContent();
-    console.log(text); // Hello World!
-})();
-class KeyboardController {
-  constructor() {
+  useConsoleLogger({ logLevel: ConsoleLogLevel.DEBUG });
+
+  class KeyboardController {
+    constructor() {
       this.keyboardmap = Key;
-  }
-  async pressKey(key, modifier) {
-      await keyboard.pressKey(key, modifier);
-  }
-  async releaseKey(key, modifier) {
-      await keyboard.releaseKey(key, modifier);
-  }
-  async type(text) {
+    }
+  
+    async pressKeys(keys) {
+      await keyboard.pressKey(...keys);
+    }
+  
+    async releaseKeys(keys) {
+      await keyboard.releaseKey(...keys);
+    }
+  
+    async type(text) {
       await keyboard.type(text);
+    }
+  
+    async parseAndExecuteKeyCommand(command) {
+      let keys = [];
+    
+      if (typeof command === 'string') {
+        keys = command.split('+').map(key => key.trim());
+      } else if (typeof command === 'number') {
+        // Si es un número, buscamos el nombre de la tecla correspondiente
+        const keyName = Object.keys(Key).find(k => Key[k] === command);
+        if (keyName) {
+          keys = [keyName];
+        } else {
+          console.warn(`No se encontró una tecla para el código: ${command}`);
+          return;
+        }
+      } else {
+        console.warn('Tipo de comando no válido');
+        return;
+      }
+    
+      try {
+        // Convertir nombres de teclas a códigos de teclas
+        const keyCodes = keys.map(key => {
+          if (typeof Key[key] === 'number') {
+            return Key[key];
+          } else if (typeof key === 'number') {
+            return key;
+          } else {
+            console.warn(`Tecla no reconocida: ${key}`);
+            return null;
+          }
+        }).filter(code => code !== null);
+    
+        // Presionar todas las teclas
+        for (const keyCode of keyCodes) {
+          await keyboard.pressKey(keyCode);
+        }    
+        // Liberar todas las teclas en orden inverso
+        for (let i = keyCodes.length - 1; i >= 0; i--) {
+          await keyboard.releaseKey(keyCodes[i]);
+        }
+    
+        console.log(`Executed key command: ${keys.join('+')}`);
+      } catch (error) {
+        console.error('Error al ejecutar el comando de teclado:', error);
+      }
+    }
+  
+    findKeyboardControl(key) {
+      const keyUpperCase = key.toUpperCase();
+      for (const [k, v] of Object.entries(this.keyboardmap)) {
+        if (v.toUpperCase() === keyUpperCase) {
+          return Key[k];
+        }
+      }
+      return null;
+    }
   }
-}
-const keyboardController = new KeyboardController();
+  
+  const keyboardController = new KeyboardController();
+  
+  // Ejemplo de uso
+  (async () => {
+    await keyboardController.parseAndExecuteKeyCommand("LeftAlt+F1");
+
+    // Usando un código de tecla numérico
+    await keyboardController.parseAndExecuteKeyCommand(125);  // AudioPlay
+    
+    // Usando una combinación de teclas con códigos numéricos
+    await keyboardController.parseAndExecuteKeyCommand("107+1");  // LeftAlt+F1
+  })();
 module.exports = { mouseController, getKeyboardControlsAsJSONKey, keyboardController };
-//   async function moveMouseUpAndDown() {
-//     console.log("Iniciando movimiento del ratón...");
-//     let distance = 100;
-//     await mouseController.moveUp(distance);
-//     await sleep(2000);
-//     await mouseController.moveDown(distance);
-//     await sleep(2000);
-//     await mouseController.moveLeft(distance);
-//     await sleep(2000);
-//     await mouseController.moveRight(distance);
-//     await sleep(2000);
-//     console.log("Movimiento del ratón completado.");
-//   }
-//   moveMouseUpAndDown().then(() => {
-//     console.log("Prueba completada con éxito.");
-//   }).catch((error) => {
-//     console.error("Error durante la prueba:", error);
-//   });

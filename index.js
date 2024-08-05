@@ -13,7 +13,7 @@ const OBSWebSocket = require('obs-websocket-js').default;
 const store = new Store(); 
 const port = process.env.PORT || 8081;
 const app1 = express();
-const { mouseController, getKeyboardControlsAsJSONKey } = require('./keynut');
+const { mouseController, getKeyboardControlsAsJSONKey, keyboardController } = require('./keynut');
 app1.use(cors());
 app1.use(express.json());
 app1.use('/api', routes);
@@ -125,3 +125,6 @@ app.on('activate', function () {
 ipcMain.handle('get-keyboard', async (event, arg) => {
   return getKeyboardControlsAsJSONKey(arg);
 }); 
+ipcMain.handle('parse-and-execute-key-command', async (event, arg) => {
+  return keyboardController.parseAndExecuteKeyCommand(arg);
+});
