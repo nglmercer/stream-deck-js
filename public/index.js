@@ -7,6 +7,9 @@ import {     validateForm,
     resetForm,
     getFiles123,
     filesform, } from '../functions/dataHandler.js';
+import { svglist } from './svg/svgconst.js';
+import { fillForm } from './utils/formfiller.js';
+import { ButtonGrid } from './gridcontent/gridelements.js';
 const streamcontrolsDBManager = createDBManager(databases.streamcontrols);
 let keyboardarray = [];
 let keyboardObject;
@@ -90,11 +93,36 @@ class Modalmanagerelement {
         });
     }
     onModalOpen = async (modal) => {
+        const formmodal = modal.modal.querySelector('form');
+
         console.log('Modal abierta, ejecutando acciones personalizadas cadavez');
+        resetForm(formmodal);
     }
 
     openModal = async (config = {}) => {
         await this.modal.open();
+    }
+    openForEdit = async (data) => {
+        await this.modal.openWithCustomAction(async (modal) => {
+            console.log('Modal abierta para editar:', data);
+            const form = modal.modal.querySelector('form');
+            if (form) {
+                await fillForm(form, data, '_');
+            }
+            modal.modal.querySelector('.modalActionAdd').style.display = 'none';
+            modal.modal.querySelector('.modalActionSave').style.display = 'block';
+            modal.addCustomEventListener('.modalActionSave', 'click', async () => {
+                const nameFilter = obtenerDatos(form, '_', {});
+                if (nameFilter.id) {
+                    await streamcontrolsDBManager.updateData(nameFilter);
+                    console.log('Guardando datos de la base de datos EXISTE ID', nameFilter.id);
+                } else {
+                    console.log('Guardando datos de la base de datos NO EXISTE ID', nameFilter.id);
+                }
+                // Aquí podrías añadir lógica adicional después de guardar
+                this.modal.close();
+            });
+        });
     }
 }
 const modalManager = new Modalmanagerelement();
@@ -137,24 +165,53 @@ const streamcontrolstable = new TableManager('minecraft-tablemodal',
             streamcontrolstable.dbManager.deleteData(id);
         }
     },
-    // onEditar: (item) => {
-    //     console.log('Custom edit callback', item);
-    //     modalminecraftManager.openForEdit(item);
-    // }
+    onEditar: (item) => {
+        console.log('Custom edit callback', item);
+        modalManager.openForEdit(item);
+    }
 },
 {
     default: 'custombutton', // Clase por defecto para todos los botones
     onDelete: 'deleteButton', // Clase específica para el botón de eliminar
 }, 
 [],
-// {
-//     onDelete: svglist.deleteSvgIcon,
-//     onEditar: svglist.editSvgIcon,
-// },
-// {
-//     onDelete: 'Eliminar este elemento',
-//     onEditar: 'Editar este elemento',
-//  }
+{
+    onDelete: svglist.deleteSvgIcon,
+    onEditar: svglist.editSvgIcon,
+},
+{
+    onDelete: 'Eliminar este elemento',
+    onEditar: 'Editar este elemento',
+ }
 );
 
 streamcontrolstable.loadAndDisplayAllData();
+const buttonGrid = new ButtonGrid('buttonContainer', 100, 50, 5, 5);
+buttonGrid.addButtons([
+    { id: 'Button 1', text: 'Button 1', value: '1', callback: (value) => console.log(`Button ${value} clicked`) },
+    { id: 'Button 2', text: 'Button 2', value: '2', callback: (value) => console.log(`Button ${value} clicked`) },
+    // Agrega más botones según sea necesario
+]);
+async function getdbdata() {
+    try {
+        const alldatabtManager = await streamcontrolsDBManager.getAllData();
+        creategridbuttons(alldatabtManager);
+        return alldatabtManager;
+    } catch (error) {
+        console.error('Error al obtener los datos de la base de datos:', error);
+    }
+}
+getdbdata();
+function creategridbuttons(data) {
+    console.log('data', data);
+    const dataparsed = data.map(item => ({
+        id:  `${item.id}`,
+        text: item.streamkeyselector.select,
+        value: `${item.id}`,
+        callback: (value) => console.log(`Button ${item.streamkeyselector.select} clicked`)
+    }));
+    console.log('dataparsed', dataparsed);
+    buttonGrid.addButtons(dataparsed);
+}
+// Para activar/desactivar el modo de edición
+document.getElementById('toggleEditMode').addEventListener('click', () => buttonGrid.toggleEditMode());

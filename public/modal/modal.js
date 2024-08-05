@@ -157,6 +157,7 @@ class CustomSelector {
         this.isOpen = false;
         this.isInitialized = false;
         this.customClass = options.customClass || ''; // Nueva: clase CSS personalizada
+        this.boundOutsideClickListener = this.handleOutsideClick.bind(this); // Añade esto para manejar el evento
     }
 
     initialize() {
@@ -195,6 +196,7 @@ class CustomSelector {
         input.parentNode.insertBefore(button, input.nextSibling);
     }
 
+
     addEventListeners() {
         const button = this.modalElement.querySelector(`#${this.options.id}-button`);
         button.addEventListener('click', () => this.toggleSelector());
@@ -203,9 +205,13 @@ class CustomSelector {
     async toggleSelector() {
         if (this.isOpen) {
             this.selectorElement.style.display = 'none';
+            document.removeEventListener('click', this.boundOutsideClickListener); // Quita el listener cuando se cierra
         } else {
             await this.populateOptions();
             this.selectorElement.style.display = 'block';
+            setTimeout(() => {
+                document.addEventListener('click', this.boundOutsideClickListener); // Añade el listener cuando se abre
+            }, 0);
         }
         this.isOpen = !this.isOpen;
     }
@@ -256,6 +262,14 @@ class CustomSelector {
             this.referenceImage.style.display = 'none';
         }
     }
+    handleOutsideClick(event) {
+        if (this.selectorElement && !this.selectorElement.contains(event.target) && !event.target.matches(`#${this.options.id}-button`)) {
+            this.selectorElement.style.display = 'none';
+            this.isOpen = false;
+            document.removeEventListener('click', this.boundOutsideClickListener); // Quita el listener cuando se oculta
+        }
+    }
+
 }
 /// aaaaaaaaaaaaaaaaaaaaaa
 // export {ModalModule};

@@ -1,4 +1,29 @@
-.minecraftmodal {
+.controlmanager {
     background-color: rgb(164, 213, 255);
     padding: 2%;
+    .tittle {
+        color: white;
+        text-align: center;
+        font-size: 2rem;
+    }
+    .inputGroup {
+
+        gap: 1rem;
+        label {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        input {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid rgba(var(--color-1), 0.1);
+            background-color: var(--color-6);
+        }
+    }
 }

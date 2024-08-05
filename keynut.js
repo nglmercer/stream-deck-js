@@ -4,7 +4,7 @@ const {
     sleep,
     useConsoleLogger,
     ConsoleLogLevel,
-    Point, Key 
+    Point,keyboard, Key, clipboard
   } = require('@nut-tree-fork/nut-js');
   class MouseController {
     constructor() {
@@ -53,7 +53,28 @@ const {
   
 console.log(getKeyboardControlsAsJSONKey());
   const mouseController = new MouseController();
-module.exports = { mouseController, getKeyboardControlsAsJSONKey };
+  (async () => {
+    await keyboard.pressKey(Key.LeftControl, Key.C);
+    await keyboard.releaseKey(Key.LeftControl, Key.C);
+    const text = await clipboard.getContent();
+    console.log(text); // Hello World!
+})();
+class KeyboardController {
+  constructor() {
+      this.keyboardmap = Key;
+  }
+  async pressKey(key, modifier) {
+      await keyboard.pressKey(key, modifier);
+  }
+  async releaseKey(key, modifier) {
+      await keyboard.releaseKey(key, modifier);
+  }
+  async type(text) {
+      await keyboard.type(text);
+  }
+}
+const keyboardController = new KeyboardController();
+module.exports = { mouseController, getKeyboardControlsAsJSONKey, keyboardController };
 //   async function moveMouseUpAndDown() {
 //     console.log("Iniciando movimiento del ratón...");
 //     let distance = 100;

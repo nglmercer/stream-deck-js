@@ -12,6 +12,7 @@
         <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="./css/output.css" rel="stylesheet">
+    <link rel="stylesheet" href="./css/modaldefault.css">
     <script src="./index.js" type="module"></script>
     <style>
       button {
@@ -20,7 +21,7 @@
       }
     </style>
     </head>
-    <body class="bg-sky-600 dark:bg-purple-800 text-cyan-50">
+    <body class="bg-sky-600 dark:bg-gray-800 text-cyan-50">
         
       <div class="parent">
         <div class="divnavbar">
@@ -29,26 +30,57 @@
         </div>
         </div>
         <div class="divmenu">
-          <button id="openModal1" class="openModal1"> Abrir modal </button>
+          <div class="dropdown-menu">
+            <input type="checkbox" id="menu-toggle" class="menu-toggle">
+            <label for="menu-toggle" class="menu-label">
+              <img src="svg/pinboard.svg" class="icon">
+            </label>
+          <div class="tabs-menu">
+             <!-- Creamos un Fijador para el menú de tabs -->
+            <div class="tab-item" data-tab="tab1">
+                <img src="svg/chat.svg" class="icon">
+                <a data-translate="Chat&Live">Chat LIVE</a>
+            </div>
+            <div class="tab-item" data-tab="tab2">
+                <img src="svg/minecraft.svg" class="icon">
+                <a data-translate="Minecraftlive">Minecraft</a>
+            </div>
+        </div>
+        </div>
         </div>
         <div class="divcontent">
-          <div id="minecraft-tablemodal" display="none"></div>
+          <div id="tab1" class="tab-content">
+            <div class="containerbox">
+              <button id="openModal1" class="openModal1"> Abrir modal </button>
+              <div id="minecraft-tablemodal" display="none"></div>
+    
+    
+              <div id="btn-scenes" class="btn-scenes">
+              </div>
+              <div id="buttonContainer"></div>
+              <button id="toggleEditMode">toggleEditMode</button>
+            </div>
 
-          <form id="obsForm" class="grid grid-flow-dense gap-4 p-4">
-            <label for="localhost">Host:</label>
-            <input type="text" id="localhost" name="localhost" value="localhost" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
-    
-            <label for="port">Puerto:</label>
-            <input type="text" id="port" name="port" value="4455" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
-    
-            <label for="password">Contraseña:</label>
-            <input type="text" id="password" name="password" value="123456" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
-    
-            <button type="submit">Conectar a OBS</button>
-        </form>
-          <div id="btn-scenes" class="">
           </div>
-          <div class="div-btn">
+         
+
+            <div id="tab2" class="tab-content">
+              <div class="containerbox">
+                <form id="obsForm" >
+                  <label for="localhost">Host:</label>
+                  <input type="text" id="localhost" name="localhost" value="localhost" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
+          
+                  <label for="port">Puerto:</label>
+                  <input type="text" id="port" name="port" value="4455" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
+          
+                  <label for="password">Contraseña:</label>
+                  <input type="text" id="password" name="password" value="123456" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
+          
+                  <button type="submit">Conectar a OBS</button>
+              </form>
+            </div>
+          </div>
+          <!-- <div class="div-btn">
             <button id="btn-copy" class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">Copiar</button>
             <button id="btn-page"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">Pegar</button>
             <button id="btn-paper"class="rounded-lx bg-sky-600 hover:bg-sky-800 m-1">Paper</button>
@@ -63,15 +95,11 @@
             <div id="resp" ></div>
             <div id="OBSVersion"></div>
             <div id="buttonDataContainer"></div>
-            <!-- 
-            <input type="text" id="textInput">
-            <button id="buttonDatasend">Enviar</button>
-            -->
             </div>
-            <div id="programasContainer"></div>
+            <div id="programasContainer"></div> -->
 
             
-            <div id="editModeButton">
+            <!-- <div id="editModeButton">
                 <input type="checkbox" id="toggleCheckboxes" class="hidden peer">
                 <label for="toggleCheckboxes" class=" min-w-5 max-w-20 max-h-20 inline-flex items-start pr-4 justify-between text-white bg-sky-200 border-2 border-gray-200 rounded-lx cursor-pointer dark:hover:text-gray-300 dark:border-sky-500 peer-checked:border-blue-600 hover:text-gray-900 peer-checked:bg-red-700 dark:peer-checked:text-white peer-checked:text-white dark:text-white dark:bg-sky-500 my-2" >Modo Editor </label>
             <div id="keyboardButtons" class="flex items-center justify-center py-4 md:py-8 flex-wrap">
@@ -95,14 +123,55 @@
               </div>
             </div>
           </div>
+          </div> -->
           </div>
-          </div>
-        </div>
-        <div class="divfooter"></div>
+        <!-- <div class="divfooter"></div> -->
 
 
         <script src="/api.js"></script>
         <script src="/socketio_connect.js"></script>
         <script src="/Modal.js"></script>
+        <script>
+
+          document.addEventListener('DOMContentLoaded', () => {
+            const tabs = document.querySelectorAll('.tab-item');
+            const tabContents = document.querySelectorAll('.tab-content');
+        
+            function activateTab(tab) {
+                const tabId = tab.getAttribute('data-tab');
+                const content = document.getElementById(tabId);
+        
+                // Deactivate all tabs and content
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+        
+                // Activate the selected tab and content
+                tab.classList.add('active');
+                content.classList.add('active');
+        
+                // Store the last active tab in localStorage
+                localStorage.setItem('activeTab', tabId);
+            }
+        
+            // Add event listeners to tabs
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => activateTab(tab));
+            });
+        
+            // Check for the last active tab in localStorage
+            const lastActiveTab = localStorage.getItem('activeTab');
+            if (lastActiveTab) {
+                const tab = document.querySelector(`.tabs[data-tab="${lastActiveTab}"]`);
+                if (tab) {
+                    activateTab(tab);
+                } else {
+                    activateTab(tabs[0]); // Fallback to the first tab if the stored tab doesn't exist
+                }
+            } else {
+                activateTab(tabs[0]); // Default to the first tab
+            }
+        });
+        
+        </script>
     </body>
 </html>
