@@ -2,21 +2,16 @@ const { app, BrowserWindow, protocol, ipcMain, dialog, globalShortcut, ipcRender
 const path = require('path');
 const url = require('url');
 const Store = require('electron-store');
-const routes = require('./routes');
-const socketHandler = require('./socketHandler');
-const updateHandler = require('./updateHandler');
 let mainWindow;
-const express = require('express');
-const { createServer } = require('http');
-const cors = require('cors');
 const OBSWebSocket = require('obs-websocket-js').default;
 const store = new Store(); 
-const port = process.env.PORT || 8081;
-const app1 = express();
+const PORT = process.env.PORT || 8081;
 const { mouseController, getKeyboardControlsAsJSONKey, keyboardController } = require('./keynut');
-app1.use(cors());
-app1.use(express.json());
-app1.use('/api', routes);
+const createServer = require('./server');
+const server = createServer();
+
+
+// server.use('/api', routes);
 // require('electron-reload')(__dirname, {
 //   electron: path.join(__dirname, 'node_modules', '.bin', 'electron'),
 //   hardResetMethod: 'exit'
@@ -47,19 +42,7 @@ app.on('ready', () => {
       mainWindow.webContents.reload(); // Reload the page on F5
     }
   });
-  const httpServer = createServer(app1);
-  const io = socketHandler.initSocket(httpServer);
   
-  app1.use(express.static(path.join(__dirname, 'public')));
-  httpServer.on('error', (error) => {
-      console.error('Server error:', error);
-  });
-  io.on('obsConnection', (data) => {
-    console.log(data,"obsConnection")
-  })
-  socketHandler.handleEvent('obsConnection', (data) => {
-    console.log(data, "obsConnection socket");
-});
   async function initObs(url = 'ws://127.0.0.1:4455', password = '123456') {
     try {
         const {
@@ -78,8 +61,8 @@ app.on('ready', () => {
 
   const obs = new OBSWebSocket();
   // Iniciar el servidor HTTP
-  httpServer.listen(port);
-  console.info(`Server running! Please visit http://localhost:${port}`);
+  server.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${PORT}`));
+
   // updateHandler.initAutoUpdates();
 });
 //appready event
@@ -103,7 +86,7 @@ function createWindow() {
       webSecurity: false,
   }
 });
-mainWindow.loadURL(`http://localhost:${port}/index.html`);
+mainWindow.loadURL(`http://localhost:${PORT}/index.html`);
 
 }
 // Salir cuando todas las ventanas estén cerradas

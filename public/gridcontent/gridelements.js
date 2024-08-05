@@ -206,7 +206,10 @@ class ButtonGrid {
                 const deleteButton = document.createElement('span');
                 deleteButton.className = 'delete-button';
                 deleteButton.textContent = 'x';
-                deleteButton.addEventListener('click', () => this.deleteButton(button.element.id));
+                deleteButton.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.deleteButton(button.element.id);
+                });
                 button.element.appendChild(deleteButton);
             } else {
                 const deleteButton = button.element.querySelector('.delete-button');

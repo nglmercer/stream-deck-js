@@ -15,6 +15,7 @@
   "keywords": [],
   "license": "MIT",
   "dependencies": {
+    "@josephuspaye/win-audio-outputs": "^0.1.0",
     "@nut-tree-fork/nut-js": "^4.2.2",
     "dotenv": "^16.4.4",
     "electron-drag": "^2.0.0",
@@ -23,7 +24,8 @@
     "electron-squirrel-startup": "^1.0.0",
     "electron-store": "^8.2.0",
     "express": "^4.18.2",
-    "js-yaml": "^4.1.0",
+    "loudness": "^0.4.2",
+    "node-audio-volume-mixer": "^1.0.3",
     "node-osc": "^9.1.0",
     "obs-websocket-js": "^5.0.5",
     "socket.io": "^4.7.4",

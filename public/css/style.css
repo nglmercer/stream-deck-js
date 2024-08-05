@@ -284,3 +284,15 @@ button:hover {
     align-items: center;
     text-align: center;
 }
+.slider-container {
+  margin-bottom: 15px;
+}
+.custom-slider {
+  width: 200px;
+  margin: 0 10px;
+}
+.slider-value {
+  display: inline-block;
+  width: 30px;
+  text-align: right;
+}
