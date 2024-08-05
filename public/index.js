@@ -132,20 +132,36 @@ modalManager.initializeModal().then(() => {
 }).catch(error => {
     console.error('Error initializing modal manager:', error);
 });
-window.api.getkeyboard('number').then(keyboard => {
-    console.log(JSON.parse(keyboard));
-    keyboardObject = JSON.parse(keyboard);
+// window.api.getkeyboard('number').then(keyboard => {
+//     console.log(JSON.parse(keyboard));
+//     keyboardObject = JSON.parse(keyboard);
     
-    // Convertir el objeto en un array de objetos con key y value
-    keyboardarray = Object.entries(keyboardObject).map(([key, value]) => ({ key, value }));
+//     // Convertir el objeto en un array de objetos con key y value
+//     keyboardarray = Object.entries(keyboardObject).map(([key, value]) => ({ key, value }));
     
-    console.log(keyboardarray);
+//     console.log(keyboardarray);
     
-});
+// });
 
-function getkeyboard() {
+async function getkeyboard () {
+    console.log('getkeyboard');
+    try {
+        const keyboard = await fetch('./datajson/keyboard.json')
+        const keyboardObject = await keyboard.json()
+        console.log("keyboardObject", keyboardObject);
+        // Convertir el objeto en un array de objetos con key y value
+        keyboardarray = Object.entries(keyboardObject).map(([key, value]) => ({ key, value }));
+        console.log(keyboardarray);
+    } catch (error) {
+        console.error('Error fetching JSON:', error);
+        return null;
+    }
     return keyboardarray;
 }
+setTimeout(async () => {
+    await getkeyboard ();
+    console.log('timeout');
+}, 1000);
 const streamcontrolstable = new TableManager('minecraft-tablemodal',
  'streamcontrols', 
  [
