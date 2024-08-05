@@ -10,6 +10,7 @@ import {     validateForm,
 import { svglist } from './svg/svgconst.js';
 import { fillForm } from './utils/formfiller.js';
 import { ButtonGrid } from './gridcontent/gridelements.js';
+import { socket } from './socketio_connect.js';
 // import { get } from '../routes.js';
 const streamcontrolsDBManager = createDBManager(databases.streamcontrols);
 let keyboardarray = [];
@@ -146,7 +147,7 @@ modalManager.initializeModal().then(() => {
 async function getkeyboard () {
     console.log('getkeyboard');
     try {
-        const keyboard = await fetch('./datajson/keyboard.json')
+        const keyboard = await fetch('./datajson/valueboard.json')
         const keyboardObject = await keyboard.json()
         console.log("keyboardObject", keyboardObject);
         // Convertir el objeto en un array de objetos con key y value
@@ -238,7 +239,8 @@ function creategridbuttons(data) {
 async function sendtestevent(key) {
     const idvalueboard = await getidfromvalueboard(key);
     console.log("idvalueboard",idvalueboard);
-    window.api.parseAndExecuteKeyCommand(idvalueboard);
+    // window.api.parseAndExecuteKeyCommand(idvalueboard);
+    socket.emit('keyboardController', idvalueboard);
 }
 async function getidfromvalueboard(key) {
     try {

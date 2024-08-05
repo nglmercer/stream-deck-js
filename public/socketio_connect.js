@@ -1,5 +1,5 @@
 // Conectar al servidor Socket.IO
-const socket = io('http://localhost:8081');
+const socket = io();
 
 // Manejar la conexión exitosa
 socket.on('connect', () => {
@@ -183,3 +183,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Aquí puedes agregar más listeners para otros controles de la UI
 });
+export { socket };

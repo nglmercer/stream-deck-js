@@ -3,11 +3,17 @@ const http = require('http');
 const socketIo = require('socket.io');
 const { AudioController } = require('./audioController');
 const path = require('path');
+const { mouseController, getKeyboardControlsAsJSONKey, keyboardController } = require('./keynut');
 
 function createServer() {
   const expressApp = express();
   const server = http.createServer(expressApp);
-  const io = socketIo(server);
+  const io = socketIo(server, {
+    cors: {
+      origin: "*", // Permite conexiones desde cualquier origen
+      methods: ["GET", "POST"]
+    }
+  });
 
   const audioController = new AudioController();
   expressApp.use(express.static(path.join(__dirname, 'public')));
@@ -32,7 +38,9 @@ function createServer() {
         socket.emit('error', error.message);
       }
     });
-
+    socket.on('keyboardController', (arg) => {
+      return keyboardController.parseAndExecuteKeyCommand(arg);
+    });
     // Manejar cambios en el volumen maestro
     socket.on('setMasterVolume', (volume) => {
       try {
