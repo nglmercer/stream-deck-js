@@ -177,7 +177,7 @@ class CustomSelector {
         this.selectorElement.innerHTML = `
             <h2>${this.options.title || 'Seleccionar'}</h2>
             <input type="text" class="custom-selector-search" placeholder="Buscar...">
-            <div id="custom-options-${this.options.id}"></div>
+            <div id="custom-options-${this.options.id}" class="custom-options"></div>
             <button id="accept-button-${this.options.id}" class="accept-button" style="display: none;">Aceptar</button>
         `;
         

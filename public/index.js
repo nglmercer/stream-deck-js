@@ -289,7 +289,7 @@ async function onUpdateButtons() {
 async function sendtestevent(key) {
     const idvalueboard = await getidfromvalueboard(key);
     console.log("idvalueboard",idvalueboard);
-    socket.emit('keyboardController', idvalueboard);
+    socket.emit('keyboardController', [idvalueboard]);
 }
 async function getidfromvalueboard(key) {
     try {

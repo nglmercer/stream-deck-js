@@ -296,3 +296,131 @@ button:hover {
   width: 30px;
   text-align: right;
 }
+
+/* Estilos para el contenedor del selector personalizado */
+.custom-selector {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 90vw;
+  width: 50%;
+  max-height: 80vh;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+.custom-selector h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.custom-selector-search {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+.custom-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+/* Estilos para el contenedor de opciones */
+#custom-options-giftSelector {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.custom-option:hover {
+  background-color: #e0e0e0;
+}
+
+.custom-option.selected {
+  background-color: #007bff;
+  color: white;
+}
+/* Estilos para cada opción de regalo */
+.gift-option {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.accept-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+/* Estilos para la imagen del regalo */
+.gift-option img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  margin-right: 10px;
+  border-radius: 4px;
+}
+
+/* Estilos para el nombre del regalo */
+.gift-option span {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Estilos para el input y el botón */
+#event-gift_select {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 10px;
+  width: 200px;
+}
+
+#giftSelector-button {
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+#giftSelector-button:hover {
+  background-color: #0056b3;
+}
+
+/* Estilos para cuando el selector está abierto */
+.custom-selector.open {
+  display: flex;
+}
+/* grid columns 2 */
+.gridcols2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(100px, auto));
+  gap: 0.5rem;
+}
+/* Estilos para el selector de imagen */
+.custom-selector-reference-image {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-left: 10px;
+}

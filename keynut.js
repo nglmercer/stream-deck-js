@@ -73,18 +73,12 @@ const {
   
     async parseAndExecuteKeyCommand(command) {
       let keys = [];
+      console.log("parseAndExecuteKeyCommand", command);
     
-      if (typeof command === 'string') {
-        keys = command.split('+').map(key => key.trim());
+      if (Array.isArray(command)) {
+        keys = command;
       } else if (typeof command === 'number') {
-        // Si es un número, buscamos el nombre de la tecla correspondiente
-        const keyName = Object.keys(Key).find(k => Key[k] === command);
-        if (keyName) {
-          keys = [keyName];
-        } else {
-          console.warn(`No se encontró una tecla para el código: ${command}`);
-          return;
-        }
+        keys = [command];
       } else {
         console.warn('Tipo de comando no válido');
         return;
@@ -93,26 +87,36 @@ const {
       try {
         // Convertir nombres de teclas a códigos de teclas
         const keyCodes = keys.map(key => {
-          if (typeof Key[key] === 'number') {
-            return Key[key];
+          if (typeof key === 'string') {
+            return Key[key] || null;
           } else if (typeof key === 'number') {
-            return key;
+            // Verificar si el código de tecla es válido
+            return Object.values(Key).includes(key) ? key : null;
           } else {
             console.warn(`Tecla no reconocida: ${key}`);
             return null;
           }
         }).filter(code => code !== null);
     
+        if (keyCodes.length === 0) {
+          console.warn('No se encontraron teclas válidas para ejecutar');
+          return;
+        }
+    
         // Presionar todas las teclas
         for (const keyCode of keyCodes) {
           await keyboard.pressKey(keyCode);
         }    
+    
+        // Pequeña pausa para asegurar que las teclas se presionen correctamente
+        await sleep(50);
+    
         // Liberar todas las teclas en orden inverso
         for (let i = keyCodes.length - 1; i >= 0; i--) {
           await keyboard.releaseKey(keyCodes[i]);
         }
     
-        console.log(`Executed key command: ${keys.join('+')}`);
+        console.log(`Executed key command: ${keyCodes.join('+')}`);
       } catch (error) {
         console.error('Error al ejecutar el comando de teclado:', error);
       }
@@ -130,15 +134,26 @@ const {
   }
   
   const keyboardController = new KeyboardController();
-  
-  // // Ejemplo de uso
-  // (async () => {
-  //   await keyboardController.parseAndExecuteKeyCommand("LeftAlt+F1");
+  console.log("AudioForward key code:", Key.AudioForward);
+  testpresskey();
+  async function testpresskey() {
+    try {
+      keyboard.pressKey(Key.AudioForward);
+      keyboard.releaseKey(Key.AudioForward);
+    } catch (error) {
+      console.error('Error al ejecutar el comando de teclado:', error);
+    }
 
-  //   // Usando un código de tecla numérico
-  //   await keyboardController.parseAndExecuteKeyCommand(125);  // AudioPlay
+  }
+  // // Ejemplo de uso
+  (async () => {
+    await keyboardController.parseAndExecuteKeyCommand(["LeftAlt", "F1"]);
+
+    // Usando un código de tecla numérico
+    // await keyboardController.parseAndExecuteKeyCommand(["AudioForward"]);  // AudioPlay
+    // await keyboard.pressKey(Key.AudioForward);  // AudioPlay
     
-  //   // Usando una combinación de teclas con códigos numéricos
-  //   await keyboardController.parseAndExecuteKeyCommand("107+1");  // LeftAlt+F1
-  // })();
+    // Usando una combinación de teclas con códigos numéricos
+    await keyboardController.parseAndExecuteKeyCommand(["107", "1"]);  // LeftAlt+F1
+  })();
 module.exports = { mouseController, getKeyboardControlsAsJSONKey, keyboardController };
