@@ -76,7 +76,7 @@ class Modalmanagerelement {
                 console.log('Guardando datos de la base de datos NO EXISTE ID', nameFilter.id);
             }
             modal.close();
-
+            onUpdateButtons();
         });
         modal.addCustomEventListener('.modalActionAdd',  'click', async () => {
             const formelement = modal.modal.querySelector('form');
@@ -91,7 +91,7 @@ class Modalmanagerelement {
                 console.log('Guardando datos de la base de datos NO EXISTE ID', nameFilter.id);
             }
             modal.close();
-            modal.close();
+            onUpdateButtons();
         });
     }
     onModalOpen = async (modal) => {
@@ -133,16 +133,7 @@ modalManager.initializeModal().then(() => {
 }).catch(error => {
     console.error('Error initializing modal manager:', error);
 });
-// window.api.getkeyboard('number').then(keyboard => {
-//     console.log(JSON.parse(keyboard));
-//     keyboardObject = JSON.parse(keyboard);
-    
-//     // Convertir el objeto en un array de objetos con key y value
-//     keyboardarray = Object.entries(keyboardObject).map(([key, value]) => ({ key, value }));
-    
-//     console.log(keyboardarray);
-    
-// });
+
 
 async function getkeyboard () {
     console.log('getkeyboard');
@@ -204,7 +195,7 @@ const streamcontrolstable = new TableManager('minecraft-tablemodal',
 );
 
 streamcontrolstable.loadAndDisplayAllData();
-const buttonGrid = new ButtonGrid('buttonContainer', 100, 50, 5, 5);
+const buttonGrid = new ButtonGrid('buttonContainer', 100, 50, 5, 5, onDeleteButton);
 // buttonGrid.addButtons([
 //     { id: 'Button 1', text: 'Button 1', value: '1', callback: (value) => console.log(`Button ${value} clicked`) },
 //     { id: 'Button 2', text: 'Button 2', value: '2', callback: (value) => console.log(`Button ${value} clicked`) },
@@ -212,34 +203,92 @@ const buttonGrid = new ButtonGrid('buttonContainer', 100, 50, 5, 5);
 //     { id: 'Button 4', text: 'Button 4', value: '4', callback: (value) => console.log(`Button ${value} clicked`) },
 //     // Agrega más botones según sea necesario
 // ]);
-async function getdbdata() {
-    try {
-        const alldatabtManager = await streamcontrolsDBManager.getAllData();
-        creategridbuttons(alldatabtManager);
-        return alldatabtManager;
-    } catch (error) {
-        console.error('Error al obtener los datos de la base de datos:', error);
+class ButtonManager {
+    constructor(dbManager, buttonGrid) {
+        this.dbManager = dbManager;
+        this.buttonGrid = buttonGrid;
+    }
+
+    async deleteButton(id) {
+        console.log('Custom delete callback', id);
+        const splitid = id.split('-');
+        const giftId = splitid[1];
+        console.log('giftId', giftId);
+        try {
+            await this.dbManager.deleteData(giftId);
+            await this.updateButtons();
+        } catch (error) {
+            console.error('Error al borrar el dato de la base de datos:', error);
+        }
+    }
+
+    async updateButtons() {
+        try {
+            const allData = await this.dbManager.getAllData();
+            const parsedData = this.createButtons(allData);
+            this.buttonGrid.updateButtons(parsedData);
+        } catch (error) {
+            console.error('Error al obtener los datos de la base de datos:', error);
+        }
+    }
+
+    async addButtons() {
+        try {
+            const allData = await this.dbManager.getAllData();
+            const parsedData = this.createButtons(allData);
+            this.buttonGrid.addButtons(parsedData);
+            return allData;
+        } catch (error) {
+            console.error('Error al obtener los datos de la base de datos:', error);
+        }
+    }
+
+    createButtons(data) {
+        console.log('data', data);
+        return data.map(item => ({
+            id: `${item.id}`,
+            text: item.streamkeyselector.select,
+            value: item.id,
+            callback: () => {
+                sendtestevent(item.streamkeyselector.select);
+                console.log(`Button ${item.streamkeyselector.select}[${item.id}] clicked`);
+            }
+        }));
     }
 }
-getdbdata();
-function creategridbuttons(data) {
-    console.log('data', data);
-    const dataparsed = data.map(item => ({
-        id:  `${item.id}`,
-        text: item.streamkeyselector.select,
-        value: `${item.id}`,
-        callback: (value) => {
-            sendtestevent(item.streamkeyselector.select);
-            console.log(`Button ${item.streamkeyselector.select}[${item.id}] clicked`)
-        }
-    }));//console.log(`Button ${item.streamkeyselector.select} clicked`)
-    console.log('dataparsed', dataparsed);
-    buttonGrid.addButtons(dataparsed);
+
+// Instancia y uso de la clase ButtonManager
+const buttonManager = new ButtonManager(streamcontrolsDBManager, buttonGrid);
+
+// Llamada inicial para obtener y añadir datos
+buttonManager.addButtons();
+
+// Ejemplo de cómo usar el callback de eliminar
+async function onDeleteButton(id) {
+    await buttonManager.deleteButton(id);
 }
+
+// Ejemplo de cómo usar la función de actualizar botones
+async function onUpdateButtons() {
+    await buttonManager.updateButtons();
+}
+
+// function creategridbuttons(data) {
+//     console.log('data', data);
+//     const dataparsed = data.map(item => ({
+//         id:  `${item.id}`,
+//         text: item.streamkeyselector.select,
+//         value: `${item.id}`,
+//         callback: (value) => {
+//             sendtestevent(item.streamkeyselector.select);
+//             console.log(`Button ${item.streamkeyselector.select}[${item.id}] clicked`)
+//         }
+//     }));//console.log(`Button ${item.streamkeyselector.select} clicked`)
+//     return dataparsed;
+// }
 async function sendtestevent(key) {
     const idvalueboard = await getidfromvalueboard(key);
     console.log("idvalueboard",idvalueboard);
-    // window.api.parseAndExecuteKeyCommand(idvalueboard);
     socket.emit('keyboardController', idvalueboard);
 }
 async function getidfromvalueboard(key) {

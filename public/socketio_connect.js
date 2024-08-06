@@ -47,7 +47,7 @@ function updateAudioUI(data) {
         sliderCreator.createOrUpdateSlider({
           id: `session-${session.pid}`,
           text: `${session.name || 'Unknown'} (PID: ${session.pid}):`,
-        //   value: session.volume * 100 || 0,
+          value: session.volume * 100 || 0,
           min: 0,
           max: 100,
           step: 1,

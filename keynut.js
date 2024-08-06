@@ -131,14 +131,14 @@ const {
   
   const keyboardController = new KeyboardController();
   
-  // Ejemplo de uso
-  (async () => {
-    await keyboardController.parseAndExecuteKeyCommand("LeftAlt+F1");
+  // // Ejemplo de uso
+  // (async () => {
+  //   await keyboardController.parseAndExecuteKeyCommand("LeftAlt+F1");
 
-    // Usando un código de tecla numérico
-    await keyboardController.parseAndExecuteKeyCommand(125);  // AudioPlay
+  //   // Usando un código de tecla numérico
+  //   await keyboardController.parseAndExecuteKeyCommand(125);  // AudioPlay
     
-    // Usando una combinación de teclas con códigos numéricos
-    await keyboardController.parseAndExecuteKeyCommand("107+1");  // LeftAlt+F1
-  })();
+  //   // Usando una combinación de teclas con códigos numéricos
+  //   await keyboardController.parseAndExecuteKeyCommand("107+1");  // LeftAlt+F1
+  // })();
 module.exports = { mouseController, getKeyboardControlsAsJSONKey, keyboardController };

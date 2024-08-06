@@ -58,7 +58,7 @@ class GridDropzone {
 }
 
 class ButtonGrid {
-    constructor(containerId, gridWidth, gridHeight, rows, cols) {
+    constructor(containerId, gridWidth, gridHeight, rows, cols, callbackondelete) {
         this.containerId = containerId;
         this.gridWidth = gridWidth;
         this.gridHeight = gridHeight;
@@ -68,6 +68,7 @@ class ButtonGrid {
         this.editMode = false;
         this.grid = [];
         this.init();
+        this.callbackondelete = callbackondelete;
     }
 
     init() {
@@ -118,7 +119,7 @@ class ButtonGrid {
                 return i;
             }
         }
-        return -1; // No hay posiciones disponibles
+        return -1; // No positions available
     }
 
     createButton(option, position = null) {
@@ -140,7 +141,7 @@ class ButtonGrid {
             this.grid[position].appendChild(button);
             this.buttons.push({ element: button, position: position, id: option.id });
         } else {
-            console.warn('No hay espacio disponible para el botón:', option.text);
+            console.warn('No space available for button:', option.text);
         }
 
         this.saveToLocalStorage();
@@ -191,6 +192,7 @@ class ButtonGrid {
         const buttonIndex = this.buttons.findIndex(b => b.element.id === id);
         if (buttonIndex !== -1) {
             const button = this.buttons[buttonIndex].element;
+            this.callbackondelete(id);
             if (button.parentNode) {
                 button.parentNode.removeChild(button);
             }
@@ -207,7 +209,7 @@ class ButtonGrid {
                 deleteButton.className = 'delete-button';
                 deleteButton.textContent = 'x';
                 deleteButton.addEventListener('click', (e) => {
-                    e.stopPropagation();
+                    // e.stopPropagation();
                     this.deleteButton(button.element.id);
                 });
                 button.element.appendChild(deleteButton);
@@ -232,7 +234,40 @@ class ButtonGrid {
         const layout = JSON.parse(localStorage.getItem('buttonGridLayout')) || [];
         return layout;
     }
+
+    updateButtons(options) {
+        // Create a map of new buttons
+        const newButtonMap = new Map(options.map(option => [option.id, option]));
+    
+        // Update or remove existing buttons
+        this.buttons = this.buttons.filter(button => {
+            if (newButtonMap.has(button.id)) {
+                // Update existing button
+                const newOption = newButtonMap.get(button.id);
+                button.element.textContent = newOption.text;
+                button.element.value = newOption.value;
+                button.element.onclick = () => newOption.callback(newOption.value);
+                newButtonMap.delete(button.id);
+                return true;
+            } else {
+                // Remove button if not in new options
+                if (button.element.parentNode) {
+                    button.element.parentNode.removeChild(button.element);
+                }
+                return false;
+            }
+        });
+    
+        // Add new buttons
+        newButtonMap.forEach(option => {
+            this.createButton(option);
+        });
+    
+        // Save new layout
+        this.saveToLocalStorage();
+    }
 }
+
 
 export { ButtonGrid };
 

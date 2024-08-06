@@ -158,6 +158,7 @@ class CustomSelector {
         this.isInitialized = false;
         this.customClass = options.customClass || ''; // Nueva: clase CSS personalizada
         this.boundOutsideClickListener = this.handleOutsideClick.bind(this); // Añade esto para manejar el evento
+        this.acceptButton = null;
     }
 
     initialize() {
@@ -175,11 +176,23 @@ class CustomSelector {
         this.selectorElement.style.display = 'none';
         this.selectorElement.innerHTML = `
             <h2>${this.options.title || 'Seleccionar'}</h2>
+            <input type="text" class="custom-selector-search" placeholder="Buscar...">
             <div id="custom-options-${this.options.id}"></div>
+            <button id="accept-button-${this.options.id}" class="accept-button" style="display: none;">Aceptar</button>
         `;
         
         const button = this.modalElement.querySelector(`#${this.options.id}-button`);
         button.parentNode.insertBefore(this.selectorElement, button.nextSibling);
+    
+        this.acceptButton = this.selectorElement.querySelector(`#accept-button-${this.options.id}`);
+        this.acceptButton.addEventListener('click', (e) =>{
+            e.preventDefault();
+             this.acceptSelection()
+            } );
+    
+        // Agregar evento de búsqueda
+        const searchInput = this.selectorElement.querySelector('.custom-selector-search');
+        searchInput.addEventListener('input', () => this.filterOptions(searchInput.value));
     }
 
     createSelectorButton() {
@@ -202,20 +215,27 @@ class CustomSelector {
         button.addEventListener('click', () => this.toggleSelector());
     }
 
-    async toggleSelector() {
+    toggleSelector() {
         if (this.isOpen) {
             this.selectorElement.style.display = 'none';
-            document.removeEventListener('click', this.boundOutsideClickListener); // Quita el listener cuando se cierra
+            document.removeEventListener('click', this.boundOutsideClickListener);
+            // Ocultar el botón de aceptar y limpiar la selección
+            this.acceptButton.style.display = 'none';
+            this.selectedItem = null;
+            const selected = this.selectorElement.querySelector('.custom-option.selected');
+            if (selected) selected.classList.remove('selected');
+            // Limpiar el campo de búsqueda
+            const searchInput = this.selectorElement.querySelector('.custom-selector-search');
+            if (searchInput) searchInput.value = '';
         } else {
-            await this.populateOptions();
+            this.populateOptions();
             this.selectorElement.style.display = 'block';
             setTimeout(() => {
-                document.addEventListener('click', this.boundOutsideClickListener); // Añade el listener cuando se abre
+                document.addEventListener('click', this.boundOutsideClickListener);
             }, 0);
         }
         this.isOpen = !this.isOpen;
     }
-
     async populateOptions() {
         this.items = await this.options.getItemsFunction();
         const optionsContainer = this.selectorElement.querySelector(`#custom-options-${this.options.id}`);
@@ -236,12 +256,19 @@ class CustomSelector {
         optionElement.classList.add('selected');
         const index = parseInt(optionElement.dataset.index);
         this.selectedItem = this.items[index];
-        const input = this.modalElement.querySelector(this.options.inputSelector);
-        if (input) {
-            this.options.onSelectFunction(input, this.selectedItem);
-            this.updateReferenceImage(this.selectedItem);
+        
+        // Mostrar el botón de aceptar
+        this.acceptButton.style.display = 'block';
+    }
+    acceptSelection() {
+        if (this.selectedItem) {
+            const input = this.modalElement.querySelector(this.options.inputSelector);
+            if (input) {
+                this.options.onSelectFunction(input, this.selectedItem);
+                this.updateReferenceImage(this.selectedItem);
+            }
+            this.toggleSelector();
         }
-        this.toggleSelector();
     }
 
     createReferenceImage() {
@@ -264,12 +291,22 @@ class CustomSelector {
     }
     handleOutsideClick(event) {
         if (this.selectorElement && !this.selectorElement.contains(event.target) && !event.target.matches(`#${this.options.id}-button`)) {
-            this.selectorElement.style.display = 'none';
-            this.isOpen = false;
-            document.removeEventListener('click', this.boundOutsideClickListener); // Quita el listener cuando se oculta
+            this.toggleSelector();
         }
     }
-
+    filterOptions(searchTerm) {
+        const optionsContainer = this.selectorElement.querySelector(`#custom-options-${this.options.id}`);
+        const options = optionsContainer.querySelectorAll('.custom-option');
+        
+        options.forEach(option => {
+            const text = option.textContent.toLowerCase();
+            if (text.includes(searchTerm.toLowerCase())) {
+                option.style.display = 'block';
+            } else {
+                option.style.display = 'none';
+            }
+        });
+    }
 }
 /// aaaaaaaaaaaaaaaaaaaaaa
 // export {ModalModule};

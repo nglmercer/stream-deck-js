@@ -10,10 +10,13 @@ class AudioController {
     this.sessions = NodeAudioVolumeMixer.getAudioSessionProcesses();
   }
 
-  // Obtener todas las sesiones de audio
+  // Obtener todas las sesiones de audio con sus volúmenes
   getAllSessions() {
     this.updateSessions();
-    return this.sessions;
+    return this.sessions.map(session => {
+      const volume = this.getSessionVolume(session.pid);
+      return { ...session, volume };
+    });
   }
 
   // Encontrar una sesión por nombre del proceso
@@ -65,4 +68,4 @@ class AudioController {
   }
 }
 
-module.exports = {AudioController};
+module.exports = { AudioController };
