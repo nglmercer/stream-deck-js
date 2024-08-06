@@ -65,41 +65,4 @@ class AudioController {
   }
 }
 
-// Ejemplo de uso
-// const audioController = new AudioController();
-
-// // Obtener todas las sesiones de audio
-// console.log("Todas las sesiones de audio:", audioController.getAllSessions());
-
-// // Buscar una sesión por nombre
-// const braveSession = audioController.findSessionByName("brave.exe");
-// console.log("Sesión de Brave:", braveSession);
-
-// // Obtener el volumen de una sesión específica
-// if (braveSession) {
-//     console.log(`El volumen actual de Brave es: ${audioController.getSessionVolume(braveSession.pid)}`);
-    
-//     // Cambiar el volumen de una sesión específica
-//     audioController.setSessionVolume(braveSession.pid, 1);
-//     console.log(`El volumen de Brave ha  ${audioController.getSessionVolume(braveSession.pid)}.`);
-// }
-
-
-// // Establecer el volumen del master al 50%
-// audioController.setMasterVolume(1);
-// console.log("Volumen del master:", audioController.getMasterVolume());
-
 module.exports = {AudioController};
-// // Establecer el volumen del master al 50%
-// audioController.setMasterVolume(0.5);
-// console.log("El volumen del master ha sido establecido al 50%.");
-
-
-
-// const { listOutputs, setVolume,  } = require('@josephuspaye/win-audio-outputs');
-// async function main() {
-//   const outputs = await listOutputs();
-//   console.log(outputs);
-// }
-
-// main();

@@ -52,7 +52,7 @@ const {
   }
   // console.log(Key);
   const mouseController = new MouseController();
-  useConsoleLogger({ logLevel: ConsoleLogLevel.DEBUG });
+  // useConsoleLogger({ logLevel: ConsoleLogLevel.DEBUG });
 
   class KeyboardController {
     constructor() {
