@@ -4,6 +4,9 @@ const socketIo = require('socket.io');
 const { AudioController } = require('./audioController');
 const path = require('path');
 const { mouseController, getKeyboardControlsAsJSONKey, keyboardController } = require('./keynut');
+const qrcode = require('qrcode');
+const ip = require('ip');
+const localIP = ip.address();
 
 function createServer() {
   const expressApp = express();
@@ -56,6 +59,16 @@ function createServer() {
       clearInterval(intervalId);
       console.log('Cliente desconectado');
     });
+    const url = `http://${localIP}:3000`;
+    qrcode.toDataURL(url, (err, url) => {
+      if (err) {
+        console.error('Error al generar el código QR:', err);
+        return;
+      }
+      socket.emit('qrcode', url);
+      console.log('QR code URL:', url);
+    });
+    console.log('URL del servidor:', url);
   });
 
   function sendAudioData(socket) {

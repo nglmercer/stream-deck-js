@@ -83,7 +83,7 @@ button:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 2rem; /* Puedes ajustar la altura según sea necesario */
+  min-height: 2rem; /* Puedes ajustar la altura según sea necesario */
 }
   
   .divmenu {
@@ -113,8 +113,9 @@ button:hover {
       a {
         color: rgb(110, 110, 110);
         font-size: medium;
-        position: absolute;
+        /* position: absolute; */
         text-justify: auto;
+        position: relative;
       }
     }
     .tab-item:hover {
@@ -136,7 +137,7 @@ button:hover {
       width: 5rem;
       overflow-x: hidden;
       height: 100%;
-      transition: all 1s; /* Animación suave para el cambio de ancho */
+      transition: all 1s; 
     }
     .tabs-menu:hover{
       width: 11rem;
@@ -145,6 +146,7 @@ button:hover {
       }
     }
     .dropdown-menu {
+      height: 100%;
       position: relative;
       .menu-label:hover {
         filter: invert(50%) sepia(100%) saturate(500%) hue-rotate(180deg);
@@ -168,16 +170,6 @@ button:hover {
     .menu-toggle:checked ~ .tabs-menu {
       width: 11rem;
 
-    }
-    .menu-toggle:checked ~ .tabs-menu .tab-item {
-      display: block; /* Show all items when checkbox is checked */
-    }
-    .tab-item {
-      display: none; /* Hide all items by default */
-    }
-    
-    .tab-item:first-child {
-      display: block; /* Always show the first item */
     }
     
   }
@@ -223,6 +215,26 @@ button:hover {
     justify-content: center;
     height: 50px; /* Puedes ajustar la altura según sea necesario */
   }
+  @media (max-width: 900px) { /* Ajusta este valor según tus necesidades */
+    .tabs-menu {
+      display: flex;
+    }
+    .parent {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto 1fr;
+      grid-template-areas:
+        "navbar"
+        "menu"
+        "content"
+        /* "footer" */
+        ;
+    }
+    .tab-item{
+      a{
+        display: none;
+      }
+    }
+  }
   #containerId {
     display: grid;
     width: 100%;
@@ -239,7 +251,7 @@ button:hover {
     gap: 1px;
     /* background-color: #eee; */
     padding: 1px;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
 }
 
 .grid-cell {
@@ -274,8 +286,8 @@ button:hover {
 
 .trash-zone {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 30px;
+    right: 30px;
     width: 100px;
     height: 100px;
     border: 2px dashed #999;
@@ -285,16 +297,52 @@ button:hover {
     text-align: center;
 }
 .slider-container {
-  margin-bottom: 15px;
+  margin-bottom: 30px;
+  font-family: Arial, sans-serif;
+  label {
+    /* display: block; */
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
 }
+
 .custom-slider {
-  width: 200px;
-  margin: 0 10px;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 20px;
+  background: #d3d3d3;
+  border-radius: 15px;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity .2s;
 }
-.slider-value {
-  display: inline-block;
+
+.custom-slider:hover {
+  opacity: 1;
+}
+
+.custom-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
   width: 30px;
-  text-align: right;
+  height: 30px;
+  background: white;
+  border: 2px solid black;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.custom-slider::-moz-range-thumb {
+  width: 30px;
+  height: 30px;
+  background: white;
+  border: 2px solid black;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.slider-value {
+  float: right;
 }
 
 /* Estilos para el contenedor del selector personalizado */
@@ -423,4 +471,48 @@ button:hover {
   height: 50px;
   object-fit: contain;
   margin-left: 10px;
+}
+
+.carousel-container {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+
+}
+
+.carousel-items {
+  display: flex;
+  transition: transform 0.3s ease;
+  user-select: none;
+}
+
+.carousel-item {
+  margin: 0;
+  padding: 0;
+  min-width: 200px; /* Ajustar según sea necesario */
+  /* margin: 0 10px; */
+  background: lightgray;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.carousel-button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+}
+
+#prev-button {
+  left: 10px;
+}
+
+#next-button {
+  right: 10px;
 }

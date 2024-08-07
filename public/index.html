@@ -82,9 +82,159 @@
           
                   <button type="submit">Conectar a OBS</button>
               </form>
-            </div>
-          </div>
 
+              <div id="carousel-container" class="carousel-container">
+                <div class="carousel-items">
+                  <button class="tab-item" data-tab="tab1">Tab 1</button>
+                  <button class="tab-item" data-tab="tab2">Tab 2</button>
+                  <button class="tab-item" data-tab="tab3">Tab 3</button>
+                  <!-- Más elementos aquí -->
+              </div>
+                <button id="prev-button" class="carousel-button">Prev</button>
+                <button id="next-button" class="carousel-button">Next</button>
+            </div>
+            
+          </div>
+            <script>
+              class InfiniteCarousel {
+                constructor(containerId, itemClass, itemSelector) {
+                    this.container = document.getElementById(containerId);
+                    this.itemsContainer = this.container.querySelector('.carousel-items');
+                    this.itemClass = itemClass;
+                    this.itemSelector = itemSelector;
+                    this.itemWidth = 200; // Ajusta esto según el ancho de tus elementos
+                    this.currentIndex = 0;
+                    this.isDragging = false;
+                    this.startX = 0;
+                    this.currentTranslate = 0;
+                    this.prevTranslate = 0;
+            
+                    this.initialize();
+                }
+            
+                initialize() {
+                    this.items = Array.from(this.container.querySelectorAll(this.itemSelector));
+                    this.renderItems();
+                    this.addEventListeners();
+                    this.setupInfiniteScroll();
+                }
+            
+            
+                renderItems() {
+                  // Limpiar el contenedor
+                  this.itemsContainer.innerHTML = '';
+          
+                  // Renderizar los items originales
+                  this.items.forEach(item => {
+                      this.itemsContainer.appendChild(this.createItemElement(item));
+                  });
+                  
+                  // Duplicar los items para crear el efecto infinito
+                  this.items.forEach(item => {
+                      this.itemsContainer.appendChild(this.createItemElement(item.cloneNode(true)));
+                  });
+              }
+            
+                createItemElement(item) {
+                  const itemElement = document.createElement('div');
+                  itemElement.className = this.itemClass;
+                  
+                  if (item.classList.contains('tab-item')) {
+                      const button = document.createElement('button');
+                      button.textContent = item.textContent;
+                      button.className = item.className;
+                      button.dataset.tab = item.dataset.tab;
+                      button.addEventListener('click', () => {
+                          console.log(`Tab clicked: ${button.dataset.tab}`);
+                      });
+                      itemElement.appendChild(button);
+                  } else {
+                      itemElement.appendChild(item.cloneNode(true));
+                  }
+                  
+                  return itemElement;
+              }
+            
+                setupInfiniteScroll() {
+                    const totalWidth = this.items.length * this.itemWidth;
+                    this.itemsContainer.style.width = `${totalWidth * 2}px`; // Doble ancho para los elementos duplicados
+                }
+            
+                addEventListeners() {
+                    const prevButton = this.container.querySelector('#prev-button');
+                    const nextButton = this.container.querySelector('#next-button');
+            
+                    prevButton.addEventListener('click', () => this.moveToPrev());
+                    nextButton.addEventListener('click', () => this.moveToNext());
+            
+                    this.itemsContainer.addEventListener('mousedown', this.startDrag.bind(this));
+                    this.itemsContainer.addEventListener('mouseup', this.endDrag.bind(this));
+                    this.itemsContainer.addEventListener('mouseleave', this.endDrag.bind(this));
+                    this.itemsContainer.addEventListener('mousemove', this.drag.bind(this));
+            
+                    // Añadir listener para el final de la transición
+                    this.itemsContainer.addEventListener('transitionend', this.checkPosition.bind(this));
+                }
+            
+                startDrag(event) {
+                    this.isDragging = true;
+                    this.startX = event.clientX;
+                    this.prevTranslate = this.currentTranslate;
+                }
+            
+                endDrag() {
+                    this.isDragging = false;
+                    this.prevTranslate = this.currentTranslate;
+                    this.checkPosition();
+                }
+            
+                drag(event) {
+                    if (!this.isDragging) return;
+                    const currentX = event.clientX;
+                    const movementX = currentX - this.startX;
+                    this.currentTranslate = this.prevTranslate + movementX;
+                    this.applyTransform();
+                }
+            
+                moveToPrev() {
+                    this.currentTranslate += this.itemWidth;
+                    this.applyTransform();
+                }
+            
+                moveToNext() {
+                    this.currentTranslate -= this.itemWidth;
+                    this.applyTransform();
+                }
+            
+                applyTransform() {
+                    this.itemsContainer.style.transition = 'transform 0.3s ease-out';
+                    this.itemsContainer.style.transform = `translateX(${this.currentTranslate}px)`;
+                }
+            
+                checkPosition() {
+                    const totalWidth = this.items.length * this.itemWidth;
+                    
+                    // Si llegamos al final, saltamos al inicio
+                    if (Math.abs(this.currentTranslate) >= totalWidth) {
+                        this.currentTranslate += totalWidth;
+                        this.itemsContainer.style.transition = 'none';
+                        this.itemsContainer.style.transform = `translateX(${this.currentTranslate}px)`;
+                    }
+                    
+                    // Si llegamos al inicio, saltamos al final
+                    if (this.currentTranslate > 0) {
+                        this.currentTranslate -= totalWidth;
+                        this.itemsContainer.style.transition = 'none';
+                        this.itemsContainer.style.transform = `translateX(${this.currentTranslate}px)`;
+                    }
+            
+                    this.prevTranslate = this.currentTranslate;
+                }
+            }
+            
+            const carousel = new InfiniteCarousel('carousel-container', 'carousel-item', '.tab-item');
+
+            </script>
           </div>
         <!-- <div class="divfooter"></div> -->
 
@@ -121,8 +271,10 @@
         
             // Check for the last active tab in localStorage
             const lastActiveTab = localStorage.getItem('activeTab');
+            console.log("lastActiveTab", lastActiveTab);
             if (lastActiveTab) {
-                const tab = document.querySelector(`.tabs[data-tab="${lastActiveTab}"]`);
+                const tab = document.querySelector(`.tab-item[data-tab="${lastActiveTab}"]`);
+                console.log("tab", tab);
                 if (tab) {
                     activateTab(tab);
                 } else {

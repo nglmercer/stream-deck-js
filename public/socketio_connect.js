@@ -30,6 +30,9 @@ socket.on('audioData', (data) => {
     // Aquí puedes actualizar tu interfaz de usuario con los nuevos datos
     updateAudioUI(data);
 });
+socket.on('qrcode', (url) => {
+  console.log('QR code URL:', url);
+});
 // Función para cambiar el volumen de una sesión específica
 function changeVolume(pid, volume) {
     socket.emit('setVolume', { pid, volume });
@@ -44,10 +47,11 @@ function changeMasterVolume(volume) {
 function updateAudioUI(data) {
     // console.log('Actualizando UI con datos de audio recibidos:', data);
     data.sessions.forEach(session => {
-        sliderCreator.createOrUpdateSlider({
+      const roundedValue = Number((session.volume * 100).toFixed(5));
+      sliderCreator.createOrUpdateSlider({
           id: `session-${session.pid}`,
           text: `${session.name || 'Unknown'} (PID: ${session.pid}):`,
-          value: session.volume * 100 || 0,
+          value: roundedValue || 0,
           min: 0,
           max: 100,
           step: 1,
@@ -116,10 +120,10 @@ class SliderCreator {
   
       const valueDisplay = document.createElement('span');
       valueDisplay.className = 'slider-value';
-      valueDisplay.textContent = value;
+      valueDisplay.textContent = value + '%';
   
       slider.addEventListener('input', (event) => {
-        valueDisplay.textContent = event.target.value;
+        valueDisplay.textContent = event.target.value + '%';
       });
   
       slider.addEventListener('change', (event) => {
@@ -129,8 +133,9 @@ class SliderCreator {
       });
   
       sliderContainer.appendChild(label);
-      sliderContainer.appendChild(slider);
       sliderContainer.appendChild(valueDisplay);
+
+      sliderContainer.appendChild(slider);
   
       this.container.appendChild(sliderContainer);
   
@@ -156,7 +161,7 @@ class SliderCreator {
   
       if (value !== undefined) {
         slider.value = value;
-        valueDisplay.textContent = value;
+        valueDisplay.textContent = value + '%';
       }
     }
   

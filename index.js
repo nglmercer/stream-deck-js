@@ -5,12 +5,11 @@ const Store = require('electron-store');
 let mainWindow;
 const OBSWebSocket = require('obs-websocket-js').default;
 const store = new Store(); 
-const PORT = process.env.PORT || 8081;
+const PORT = 3000;//process.env.PORT || 3000;
 const { mouseController, getKeyboardControlsAsJSONKey, keyboardController } = require('./keynut');
 const createServer = require('./server');
 const server = createServer();
-const qrcode = require('qrcode');
-const ip = require('ip');
+
 
 
 // server.use('/api', routes);
@@ -45,16 +44,7 @@ app.on('ready', () => {
     }
   });
       // Obtener la IP local
-  const localIP = ip.address();
-  const url = `http://${localIP}:${PORT}`;
-  qrcode.toDataURL(url, (err, url) => {
-    if (err) {
-      console.error('Error al generar el código QR:', err);
-      return;
-    }
-    mainWindow.webContents.send('qrcode', url);
-  });
-  console.log('URL del servidor:', url);
+
   // Iniciar el servidor HTTP
   server.listen(PORT, () => console.log(`Servidor escuchando en el puerto ${PORT}`));
 
