@@ -177,20 +177,26 @@ const streamcontrolstable = new TableManager('minecraft-tablemodal',
     onEditar: (item) => {
         console.log('Custom edit callback', item);
         modalManager.openForEdit(item);
+    },
+    onPlay: (item) => {
+        console.log('Custom play callback', item);
     }
 },
 {
     default: 'custombutton', // Clase por defecto para todos los botones
     onDelete: 'deleteButton', // Clase específica para el botón de eliminar
+    onPlay: 'playButton', // Clase específica para el botón de reproducir
 }, 
 [],
 {
     onDelete: svglist.deleteSvgIcon,
     onEditar: svglist.editSvgIcon,
+    onPlay: svglist.playsvg,
 },
 {
     onDelete: 'Eliminar este elemento',
     onEditar: 'Editar este elemento',
+    onPlay: 'Reproducir este elemento',
  }
 );
 
@@ -247,8 +253,9 @@ class ButtonManager {
         console.log('data', data);
         return data.map(item => ({
             id: `${item.id}`,
-            text: item.streamkeyselector.select,
+            text: item.streamkeyselector.text || item.streamkeyselector.select,
             value: item.id,
+            image: item.streamkeyselector.image,
             callback: () => {
                 sendtestevent(item.streamkeyselector.select);
                 console.log(`Button ${item.streamkeyselector.select}[${item.id}] clicked`);
@@ -306,5 +313,6 @@ async function getidfromvalueboard(key) {
 getidfromvalueboard('Add').then(data => {
     console.log("valueboard",data);
 });
+
 // Para activar/desactivar el modo de edición
 document.getElementById('toggleEditMode').addEventListener('click', () => buttonGrid.toggleEditMode());

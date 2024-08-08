@@ -1,62 +1,3 @@
-class GridDropzone {
-    constructor(containerId, rows, cols, cellSize) {
-        this.container = document.getElementById(containerId);
-        this.rows = rows;
-        this.cols = cols;
-        this.cellSize = cellSize;
-        this.grid = [];
-        this.init();
-    }
-
-    init() {
-        this.container.style.display = 'grid';
-        this.container.style.gridTemplateColumns = `repeat(${this.cols}, ${this.cellSize}px)`;
-        this.container.style.gridTemplateRows = `repeat(${this.rows}, ${this.cellSize}px)`;
-        this.container.style.gap = '1px';
-        this.container.style.backgroundColor = '#eee';
-        this.container.style.padding = '1px';
-
-        for (let i = 0; i < this.rows * this.cols; i++) {
-            const cell = document.createElement('div');
-            cell.className = 'grid-cell';
-            cell.style.width = `${this.cellSize}px`;
-            cell.style.height = `${this.cellSize}px`;
-            cell.style.backgroundColor = 'white';
-            cell.dataset.index = i;
-
-            cell.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                cell.style.backgroundColor = '#f0f0f0';
-            });
-
-            cell.addEventListener('dragleave', () => {
-                cell.style.backgroundColor = 'white';
-            });
-
-            cell.addEventListener('drop', (e) => {
-                e.preventDefault();
-                cell.style.backgroundColor = 'white';
-                const buttonId = e.dataTransfer.getData('text/plain');
-                const button = document.getElementById(buttonId);
-                if (button && !cell.hasChildNodes()) {
-                    cell.appendChild(button);
-                }
-            });
-
-            this.container.appendChild(cell);
-            this.grid.push(cell);
-        }
-    }
-
-    clear() {
-        this.grid.forEach(cell => {
-            while (cell.firstChild) {
-                cell.removeChild(cell.firstChild);
-            }
-        });
-    }
-}
-
 class ButtonGrid {
     constructor(containerId, gridWidth, gridHeight, rows, cols, callbackondelete) {
         this.containerId = containerId;
@@ -67,8 +8,8 @@ class ButtonGrid {
         this.buttons = [];
         this.editMode = false;
         this.grid = [];
-        this.init();
         this.callbackondelete = callbackondelete;
+        this.init();
     }
 
     init() {
@@ -76,33 +17,31 @@ class ButtonGrid {
         container.style.display = 'grid';
         container.style.width = '100%';
         container.style.height = '90vh';
-        
         container.style.gridTemplateColumns = `repeat(${this.cols}, minmax(${this.gridWidth}px, 1fr))`;
         container.style.gridTemplateRows = `repeat(${this.rows}, minmax(${this.gridHeight}px, 1fr))`;
-        
         container.style.gap = '1px';
         container.style.padding = '1px';
-    
+
         for (let i = 0; i < this.rows * this.cols; i++) {
             const cell = document.createElement('div');
             cell.className = 'grid-cell';
             cell.style.width = '100%';
             cell.style.height = '100%';
             cell.dataset.index = i;
-    
+
             cell.addEventListener('dragover', (e) => e.preventDefault());
             cell.addEventListener('drop', (e) => this.handleDrop(e, cell));
-    
+
             container.appendChild(cell);
             this.grid.push(cell);
         }
-    
+
         this.createTrashZone();
     }
 
     addButtons(options) {
         const savedLayout = this.loadFromLocalStorage();
-        
+
         options.forEach(option => {
             const savedButton = savedLayout.find(b => b.id === option.id);
             if (savedButton) {
@@ -132,6 +71,10 @@ class ButtonGrid {
         button.addEventListener('click', () => option.callback(option.value));
         button.addEventListener('dragstart', this.handleDragStart.bind(this));
         button.addEventListener('dragend', this.handleDragEnd.bind(this));
+
+        if (option.image) {
+            button.style.backgroundImage = `url(${option.image})`;
+        }
 
         if (position === null) {
             position = this.findNextAvailablePosition();
@@ -209,7 +152,7 @@ class ButtonGrid {
                 deleteButton.className = 'delete-button';
                 deleteButton.textContent = 'x';
                 deleteButton.addEventListener('click', (e) => {
-                    // e.stopPropagation();
+                    e.stopPropagation();
                     this.deleteButton(button.element.id);
                 });
                 button.element.appendChild(deleteButton);
@@ -246,7 +189,13 @@ class ButtonGrid {
                 const newOption = newButtonMap.get(button.id);
                 button.element.textContent = newOption.text;
                 button.element.value = newOption.value;
+                console.log("newOption.image", newOption.image);
                 button.element.onclick = () => newOption.callback(newOption.value);
+                if (newOption.image) {
+                    button.element.style.backgroundImage = `url(${newOption.image})`;
+                } else {
+                    button.element.style.backgroundImage = '';
+                }
                 newButtonMap.delete(button.id);
                 return true;
             } else {
@@ -265,8 +214,24 @@ class ButtonGrid {
     
         // Save new layout
         this.saveToLocalStorage();
+        // Re-parse grid positions
+        this.parseGridPositions();
+    }
+
+    parseGridPositions() {
+        this.grid.forEach((cell, index) => {
+            if (cell.hasChildNodes()) {
+                const buttonId = cell.firstChild.id;
+                const buttonIndex = this.buttons.findIndex(b => b.element.id === buttonId);
+                if (buttonIndex !== -1) {
+                    this.buttons[buttonIndex].position = index;
+                }
+            }
+        });
+        this.saveToLocalStorage();
     }
 }
+
 
 
 export { ButtonGrid };

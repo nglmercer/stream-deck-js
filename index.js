@@ -1,15 +1,14 @@
-const { app, BrowserWindow, protocol, ipcMain, dialog, globalShortcut, ipcRenderer, contextBridge } = require('electron');
+const { app, BrowserWindow, protocol, ipcMain, dialog, globalShortcut, ipcRenderer, contextBridge,desktopCapturer  } = require('electron');
 const path = require('path');
 const url = require('url');
-const Store = require('electron-store');
+const NodedbJson = require('nodedb-json');
 let mainWindow;
 const OBSWebSocket = require('obs-websocket-js').default;
-const store = new Store(); 
-const PORT = 3000;//process.env.PORT || 3000;
+const PORT = 3001;//process.env.PORT || 3000;
 const { mouseController, getKeyboardControlsAsJSONKey, keyboardController } = require('./keynut');
 const createServer = require('./server');
 const server = createServer();
-
+const dbstore = new NodedbJson('./db.json');
 
 
 // server.use('/api', routes);
@@ -25,7 +24,11 @@ app.on('ready', () => {
     mainWindow = null;
     app.quit();
   });
-
+  mainWindow.on('resize', () => {
+    dbstore.set('windowWidth', mainWindow.getSize()[0]);
+    dbstore.set('windowHeight', mainWindow.getSize()[1]);
+    console.log('resize', mainWindow.getSize(), dbstore.get('windowWidth'), dbstore.get('windowHeight'));
+  });
   mainWindow.on('focus', () => {
     globalShortcut.register('Alt+F1', ToolDev);
     globalShortcut.register('Alt+F2', cdevTool);
@@ -52,8 +55,8 @@ app.on('ready', () => {
 //appready event
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: store.get('windowWidth', 1000), // Obtener el ancho de la ventana desde Electron Store, si no está definido, usar 1000
-    height: store.get('windowHeight', 800), // Obtener la altura de la ventana desde Electron Store, si no está definida, usar 800
+    width: 1000, // Obtener el ancho de la ventana desde Electron Store, si no está definido, usar 1000
+    height: 800, // Obtener la altura de la ventana desde Electron Store, si no está definida, usar 800
     minWidth: 800, // Ancho mínimo de la ventana
     minHeight: 600, // Alto mínimo de la ventana
     titleBarStyle: 'hidden',
@@ -68,6 +71,7 @@ function createWindow() {
       contextIsolation: true,
       worldSafeExecuteJavaScript: true,
       webSecurity: false,
+      enableRemoteModule: true
   }
 });
 mainWindow.loadURL(`http://localhost:${PORT}/index.html`);
@@ -95,20 +99,29 @@ ipcMain.handle('get-keyboard', async (event, arg) => {
 ipcMain.handle('parse-and-execute-key-command', async (event, arg) => {
   return keyboardController.parseAndExecuteKeyCommand(arg);
 });
-async function initObs(url = 'ws://127.0.0.1:4455', password = '123456') {
-  try {
-      const {
-          obsWebSocketVersion,
-          negotiatedRpcVersion
-      } = await obs.connect(url, password, {
-          rpcVersion: 1
-      });
-      console.log(`Connected to server ${obsWebSocketVersion} (using RPC ${negotiatedRpcVersion})`);
-      io.emit('dataObs', obsWebSocketVersion);
-  } catch (error) {
-      console.error('Failed to connect', error.code, error.message);
-      io.emit('dataObs', obsWebSocketVersion); // obsWebSocketVersion no está definido en este ámbito
-  }
+ipcMain.handle('get-sources', async () => {
+  const inputSources = await returnSources();
+  return inputSources;
+});
+async function returnSources() {
+  const inputSources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
+  return inputSources;
 }
+// async function initObs(url = 'ws://127.0.0.1:4455', password = '123456') {
+//   try {
+//       const {
+//           obsWebSocketVersion,
+//           negotiatedRpcVersion
+//       } = await obs.connect(url, password, {
+//           rpcVersion: 1
+//       });
+//       console.log(`Connected to server ${obsWebSocketVersion} (using RPC ${negotiatedRpcVersion})`);
+//       io.emit('dataObs', obsWebSocketVersion);
+//   } catch (error) {
+//       console.error('Failed to connect', error.code, error.message);
+//       io.emit('dataObs', obsWebSocketVersion); // obsWebSocketVersion no está definido en este ámbito
+//   }
+// }
 
 const obs = new OBSWebSocket();
+module.exports = {returnSources };

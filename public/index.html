@@ -10,17 +10,15 @@
         <link rel="stylesheet" href="./css/style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.2.0/socket.io.js"></script>
         <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="./css/output.css" rel="stylesheet">
+        <script src="https://cdn.tailwindcss.com"></script>
+        <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+        <link href="./css/output.css" rel="stylesheet">
     <link rel="stylesheet" href="./css/modaldefault.css">
     <script src="./index.js" type="module"></script>
-    <style>
-      button {
-        background-color: green !important;
-        background: green !important;
-      }
-    </style>
     </head>
+    <style>
+
+    </style>
     <body class="bg-sky-600 dark:bg-gray-800 text-cyan-50">
         
       <div class="parent">
@@ -51,7 +49,7 @@
         <div class="divcontent">
           <div id="tab1" class="tab-content">
             <div class="containerbox">
-              <button id="openModal1" class="openModal1"> Abrir modal </button>
+              <button id="openModal1" class="openModal1 btn btn-primary"> Añadir acciones </button>
               <div id="minecraft-tablemodal" display="none"></div>
               <!-- div.contenito>span.texto -->
               <div class="contenito"><span class="texto"></span></div>
@@ -70,6 +68,8 @@
 
               </div>
               <div class="containerbox">
+                <span class="tittle">asdasdasdasdasdasdasdasdasdasdasdasdasd</span>
+                <br>asdasdasdasdasdasdasdasdasdasdasdasdasd
                 <form id="obsForm" >
                   <label for="localhost">Host:</label>
                   <input type="text" id="localhost" name="localhost" value="localhost" class="bg-sky-600 dark:bg-purple-800 text-cyan-500"><br><br>
@@ -82,7 +82,26 @@
           
                   <button type="submit">Conectar a OBS</button>
               </form>
+              <div class="containerbox">
+                <input id="roomInput" value="home" class="bg-sky-600 dark:bg-purple-800 text-cyan-500">
+                <input type="text" id="userRoom" value="testUser" class="bg-sky-600 dark:bg-purple-800 text-cyan-500">
+                <button id="joinRoomBtn" class="btn btn-primary">joinRoomBtn</button>
+                <br><br>
+                <button id="startBtn" class="btn btn-primary" >Start Recording</button>
+                <button id="stopBtn" disabled>Stop Recording</button>
+                <select id="deviceSelect" style="display:none;"></select>
 
+                <div>
+                    <h3>Local Preview:</h3>
+                    <video id="localPreview" autoplay muted></video>
+                </div>
+                <div>
+                    <h3>Remote Streams:</h3>
+                    <div id="remoteStreams"></div>
+                    
+                </div>
+              </div>
+              <script src="renderer.js" type="module"></script>
               <div id="carousel-container" class="carousel-container">
                 <div class="carousel-items">
                   <button class="tab-item" data-tab="tab1">Tab 1</button>

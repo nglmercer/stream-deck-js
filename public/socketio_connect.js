@@ -26,7 +26,7 @@ socket.on('error', (message) => {
     console.error('Error:', message);
 });
 socket.on('audioData', (data) => {
-    console.log('Datos de audio recibidos:', data);
+    // console.log('Datos de audio recibidos:', data);
     // Aquí puedes actualizar tu interfaz de usuario con los nuevos datos
     updateAudioUI(data);
 });
