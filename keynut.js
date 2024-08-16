@@ -134,26 +134,5 @@ const {
   }
   
   const keyboardController = new KeyboardController();
-  // console.log("AudioForward key code:", Key.AudioForward);
-  // testpresskey();
-  // async function testpresskey() {
-  //   try {
-  //     keyboard.pressKey(Key.AudioForward);
-  //     keyboard.releaseKey(Key.AudioForward);
-  //   } catch (error) {
-  //     console.error('Error al ejecutar el comando de teclado:', error);
-  //   }
 
-  // }
-  // // Ejemplo de uso
-  // (async () => {
-  //   await keyboardController.parseAndExecuteKeyCommand(["LeftAlt", "F1"]);
-
-  //   // Usando un código de tecla numérico
-  //   // await keyboardController.parseAndExecuteKeyCommand(["AudioForward"]);  // AudioPlay
-  //   // await keyboard.pressKey(Key.AudioForward);  // AudioPlay
-    
-  //   // Usando una combinación de teclas con códigos numéricos
-  //   await keyboardController.parseAndExecuteKeyCommand(["107", "1"]);  // LeftAlt+F1
-  // })();
 module.exports = { mouseController, getKeyboardControlsAsJSONKey, keyboardController };

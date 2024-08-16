@@ -13,22 +13,27 @@ class Room {
     this.roomId = roomId;
     this.users = new Map();
     this.activeBroadcaster = null;
+    this.listenerCount = 0;
+    this.audioBuffer = [];
   }
 
-  addUser(socket, userId) {
+  addUser(socket, userId, isListening = false) {
     if (this.users.has(userId)) {
       return false;
     }
-    this.users.set(userId, socket.id);
+    this.users.set(userId, { socketId: socket.id, isListening });
+    if (isListening) this.listenerCount++;
     return true;
   }
 
   removeUser(userId) {
+    const user = this.users.get(userId);
+    if (user && user.isListening) this.listenerCount--;
     return this.users.delete(userId);
   }
 
   getUserId(socketId) {
-    for (let [userId, sid] of this.users.entries()) {
+    for (let [userId, { socketId: sid }] of this.users.entries()) {
       if (sid === socketId) {
         return userId;
       }
@@ -48,16 +53,25 @@ class Room {
     this.activeBroadcaster = null;
   }
 
+  addAudioChunk(chunk) {
+    this.audioBuffer.push(chunk);
+  }
+
+  getAudioBuffer() {
+    return this.audioBuffer;
+  }
+
+  clearBuffers() {
+    this.audioBuffer = [];
+  }
   getRoomInfo() {
     return {
       roomId: this.roomId,
       users: Array.from(this.users.keys()),
-      activeBroadcaster: this.activeBroadcaster
-    };
-  }
-
-  isBroadcaster(socketId) {
-    return this.activeBroadcaster === socketId;
+      activeBroadcaster: this.activeBroadcaster,
+      listenerCount: this.listenerCount,
+      audioBuffer: this.audioBuffer
+    }
   }
 }
 
@@ -71,41 +85,49 @@ class RoomManager {
   createRoom(roomId) {
     roomId = roomId || this.defaultRoomId;
     if (!this.rooms.has(roomId)) {
-      console.log("Creando nueva sala:", roomId);
       this.rooms.set(roomId, new Room(roomId));
     }
     return this.rooms.get(roomId);
   }
 
   getRoom(roomId) {
-    roomId = roomId || this.defaultRoomId;
-    console.log("Buscando sala:", roomId);
-    const room = this.rooms.get(roomId);
-    console.log("Sala encontrada:", room);
-    return room;
+    return this.rooms.get(roomId || this.defaultRoomId);
   }
 
-  joinRoom(socket, userId, roomId) {
-    roomId = roomId || this.defaultRoomId;
-    console.log("Intentando unirse a la sala:", roomId);
-    
+  joinRoom(socket, userId, roomId, isListening = false) {
     let room = this.getRoom(roomId);
     if (!room) {
-      console.log("Sala no encontrada, creando nueva sala:", roomId);
       room = this.createRoom(roomId);
     }
-  
-    if (room.addUser(socket, userId)) {
+
+    if (room.addUser(socket, userId, isListening)) {
       socket.join(roomId);
       const roomInfo = room.getRoomInfo();
-      console.log("Usuario unido a la sala:", roomId, "Info de la sala:", roomInfo);
       socket.emit('roomJoined', roomInfo);
       socket.to(roomId).emit('userJoined', { roomId, userId, socketId: socket.id });
+
+      if (room.listenerCount > 0) {
+        this.startBroadcastIfNeeded(socket,roomId);
+      }
+
+      if (room.activeBroadcaster) {
+        socket.emit('startBroadcast', {
+          broadcasterId: room.activeBroadcaster,
+          audioBuffer: room.getAudioBuffer()
+        });
+      }
+
       return true;
     } else {
-      console.log("Error al unir usuario a la sala:", roomId);
-      socket.emit('joinError', 'Usuario ya está en la sala');
+      socket.emit('joinError', 'User already in the room');
       return false;
+    }
+  }
+
+  startBroadcastIfNeeded(socket,roomId) {
+    const room = this.getRoom(roomId);
+    if (room && room.listenerCount > 0) {
+      this.startBroadcast(socket,roomId);
     }
   }
 
@@ -143,16 +165,16 @@ class RoomManager {
   }
 
   handleStreamChunk(socket, data) {
-    console.log("handleStreamChunk", data);
     const room = this.getRoom(data.room);
+    console.log("handleStreamChunk", data, room.getRoomInfo());
+
     if (room) {
-      // Emitir a todos en la sala excepto al emisor
-      socket.to(data.room).emit('streamChunk', { 
+      room.addAudioChunk(data.chunk);
+      socket.to(data.room).emit('streamChunk', {
         broadcasterId: socket.id,
-        chunk: data.chunk
+        chunk: data.chunk,
+        type: 'audio'
       });
-    } else {
-      console.log("Sala no encontrada para el stream:", data.room);
     }
   }
 
@@ -169,8 +191,6 @@ class RoomManager {
     });
   }
 }
-
-
 
 function createServer() {
   const expressApp = express();
@@ -219,34 +239,23 @@ function createServer() {
       }
     });
 // Manejar cambio
-socket.on('joinRoom', (data) => {
-  console.log("joinRoom", data.userId , data.roomName);
-  roomManager.joinRoom(socket, data.userId, data.roomName);
+socket.on('joinRoom', ({ userId, roomId, isListening }) => {
+  roomManager.joinRoom(socket, userId, roomId, isListening);
 });
 
-socket.on('startBroadcast', (roomId) => {
-  roomManager.startBroadcast(socket, roomId);
+socket.on('leaveRoom', ({ roomId }) => {
+  roomManager.leaveRoom(socket, roomId);
 });
 
-socket.on('stopBroadcast', (roomId) => {
-  roomManager.stopBroadcast(socket, roomId);
+socket.on('sendMessage', ({ roomId, message }) => {
+  io.to(roomId).emit('message', { userId: roomManager.getRoom(roomId).getUserId(socket.id), message });
 });
 
 socket.on('streamChunk', (data) => {
   roomManager.handleStreamChunk(socket, data);
 });
-
-socket.on('disconnecting', () => {
-  socket.rooms.forEach(roomId => {
-    if (roomId !== socket.id) {
-      roomManager.leaveRoom(socket, roomId);
-    }
-  });
-});
-
   socket.on('disconnect', () => {
     console.log('Cliente desconectado:', socket.id);
-    roomManager.handleDisconnect(socket);
     clearInterval(intervalId);
 });
     const url = `http://${localIP}:3000`;

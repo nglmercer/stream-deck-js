@@ -83,6 +83,136 @@
                   <button type="submit">Conectar a OBS</button>
               </form>
               <div class="containerbox">
+                <div id="connectionForm">
+                    <h2>Conectar</h2>
+                    <label for="username">Nombre de Usuario:</label>
+                    <input type="text" id="username">
+                    <label for="roomId">Nombre de la Sala:</label>
+                    <input type="text" id="roomId">
+                    <button id="connectButton">Conectar</button>
+                  </div>
+                
+                  <div id="chatRoom" class="hidden">
+                    <h2>Sala de Chat</h2>
+                    <div id="messagePreview"></div>
+                    <input type="text" id="chatInput">
+                    <button id="sendInput">Enviar</button>
+                    <button id="audioToggle">Conectar Audio</button>
+                    <button id="disconnectButton">Desconectar</button>
+                  </div>
+                  <script type="module">
+                    import { socket } from './socketio_connect.js';
+                    import { AudioManager } from './mediastream/audioManager.js';
+                    let connected = false;
+                    const audioManager = new AudioManager(socket);
+                    let audioContext = null;
+                    let audioSource = null;
+                    let audioBufferQueue = [];
+                    document.getElementById('connectButton').addEventListener('click', () => {
+                      const username = document.getElementById('username').value;
+                      const roomId = document.getElementById('roomId').value;
+                      
+                      if (username && roomId) {
+                        socket.emit('joinRoom', { userId: username, roomId: roomId, isListening: true });
+                        connected = true;
+                        toggleVisibility();
+                      }
+                    });
+                    async function setupAudioDevices() {
+                        await audioManager.audioContext.audioWorklet.addModule('processor.js');
+                        
+                        const devices = await audioManager.getAudioDevices();
+                        const selectElement = document.getElementById('audioDeviceSelect');
+                        
+                        devices.forEach(device => {
+                            const option = document.createElement('option');
+                            option.value = device.deviceId;
+                            option.text = device.label || `Microphone ${selectElement.options.length + 1}`;
+                            selectElement.appendChild(option);
+                        });
+                      
+                        selectElement.onchange = async () => {
+                            const selectedDeviceId = selectElement.value;
+                            const success = await audioManager.selectAudioInput(selectedDeviceId);
+                            if (success) {
+                                console.log('Audio device selected successfully');
+                            } else {
+                                console.log('Failed to select audio device');
+                            }
+                        };
+                    }
+                    setupAudioDevices();
+                    
+
+                    document.getElementById('sendInput').addEventListener('click', () => {
+                      const message = document.getElementById('chatInput').value;
+                      const roomId = document.getElementById('roomId').value;
+                      socket.emit('sendMessage', { roomId, message });
+                    });
+                
+                    document.getElementById('audioToggle').addEventListener('click', async () => {
+                        await audioManager.selectAudioInput();
+                        const roomId = document.getElementById('roomId').value;
+                        audioManager.startBroadcast(roomId);
+                    });
+                    
+                
+                    document.getElementById('disconnectButton').addEventListener('click', () => {
+                        const roomId = document.getElementById('roomId').value;
+                        socket.emit('leaveRoom', { roomId });
+                        connected = false;
+                        toggleVisibility();
+                        audioManager.stopBroadcast();
+                    });
+                    
+                
+                    socket.on('message', (data) => {
+                      const preview = document.getElementById('messagePreview');
+                      preview.innerHTML += `<p><strong>${data.userId}:</strong> ${data.message}</p>`;
+                    });
+                
+                    socket.on('roomJoined', (roomInfo) => {
+                        console.log('Unido a la sala:', roomInfo);
+                        audioManager.handleUserCountChange(roomInfo.users.length, roomInfo.roomId);
+                      });
+                    
+                      socket.on('userJoined', ({ roomId, userId, socketId }) => {
+                        console.log('Nuevo usuario en la sala:', roomId, userId, socketId);
+                        audioManager.handleUserCountChange(userId.length, roomId);
+                      });
+                    
+                      socket.on('userLeft', ({ roomId, userId, socketId }) => {
+                        console.log('Nuevo usuario en la sala:', roomId, userId, socketId);
+
+                        audioManager.handleUserCountChange(userId.length, roomId);
+                      });
+
+                      socket.on('streamChunk', async (data) => {
+                        console.log('Recibiendo chunk:', data);  
+                        await playAudioChunk(data.chunk);
+                    });
+                    
+                    async function playAudioChunk(chunk) {
+                        if (!audioContext) {
+                            audioContext = new AudioContext();
+                        }
+                        
+                        const arrayBufferView = new Uint8Array(chunk);
+                        const blob = new Blob([arrayBufferView], { type: 'audio/wav' });
+                        const url = URL.createObjectURL(blob);
+                        const audio = new Audio(url);
+                        await audio.play();
+                    }
+                      function toggleVisibility() {
+                        document.getElementById('connectionForm').classList.toggle('hidden', connected);
+                        document.getElementById('chatRoom').classList.toggle('hidden', !connected);
+                      }
+
+                    
+                    
+                  </script>
+
+
                 <input id="roomInput" value="home" class="bg-sky-600 dark:bg-purple-800 text-cyan-500">
                 <input type="text" id="userRoom" value="testUser" class="bg-sky-600 dark:bg-purple-800 text-cyan-500">
                 <button id="joinRoomBtn" class="btn btn-primary">joinRoomBtn</button>
@@ -90,10 +220,22 @@
                 <button id="startBtn" class="btn btn-primary" >Start Recording</button>
                 <button id="stopBtn" disabled>Stop Recording</button>
                 <select id="deviceSelect" style="display:none;"></select>
+                <video id="localPreview" autoplay muted></video>
 
+                <div id="remoteStreams"></div>
+            
+                <!-- Modal -->
+                <div id="deviceModal" class="modal">
+                    <div class="modal-content">
+                        <span class="close">&times;</span>
+                        <h2>Select Device</h2>
+                        <select id="deviceSelect"></select>
+                        <button id="confirmDeviceBtn">Confirm</button>
+                    </div>
+                </div>
                 <div>
                     <h3>Local Preview:</h3>
-                    <video id="localPreview" autoplay muted></video>
+                    <video id="localPreview" autoplay muted style="display: block;"></video>
                 </div>
                 <div>
                     <h3>Remote Streams:</h3>
@@ -258,7 +400,6 @@
         <!-- <div class="divfooter"></div> -->
 
 
-        <script src="/api.js"></script>
         <script src="/socketio_connect.js" type="module"></script>
         <script src="/Modal.js"></script>
         <script>
