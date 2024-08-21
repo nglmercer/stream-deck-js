@@ -173,7 +173,7 @@ class SliderCreator {
       }
     }
   }
-  const sliderCreator = new SliderCreator('sliders-container');
+const sliderCreator = new SliderCreator('sliders-container');
 
   
 // Ejemplo de cómo podrías usar estas funciones con elementos de la UI

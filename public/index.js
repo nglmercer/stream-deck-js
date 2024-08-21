@@ -201,8 +201,8 @@ const streamcontrolstable = new TableManager('minecraft-tablemodal',
 );
 
 streamcontrolstable.loadAndDisplayAllData();
-const buttonGrid = new ButtonGrid('buttonContainer', 100, 50, 5, 5, onDeleteButton);
-// buttonGrid.addButtons([
+const gridbuttonscontent = new ButtonGrid('buttonContainer', 100, 50, 5, 5, onDeleteButton);
+// gridbuttonscontent.addButtons([
 //     { id: 'Button 1', text: 'Button 1', value: '1', callback: (value) => console.log(`Button ${value} clicked`) },
 //     { id: 'Button 2', text: 'Button 2', value: '2', callback: (value) => console.log(`Button ${value} clicked`) },
 //     { id: 'Button 3', text: 'Button 3', value: '3', callback: (value) => console.log(`Button ${value} clicked`) },
@@ -210,9 +210,9 @@ const buttonGrid = new ButtonGrid('buttonContainer', 100, 50, 5, 5, onDeleteButt
 //     // Agrega más botones según sea necesario
 // ]);
 class ButtonManager {
-    constructor(dbManager, buttonGrid) {
+    constructor(dbManager, gridbuttonscontent) {
         this.dbManager = dbManager;
-        this.buttonGrid = buttonGrid;
+        this.gridbuttonscontent = gridbuttonscontent;
     }
 
     async deleteButton(id) {
@@ -232,7 +232,7 @@ class ButtonManager {
         try {
             const allData = await this.dbManager.getAllData();
             const parsedData = this.createButtons(allData);
-            this.buttonGrid.updateButtons(parsedData);
+            this.gridbuttonscontent.updateButtons(parsedData);
         } catch (error) {
             console.error('Error al obtener los datos de la base de datos:', error);
         }
@@ -242,7 +242,7 @@ class ButtonManager {
         try {
             const allData = await this.dbManager.getAllData();
             const parsedData = this.createButtons(allData);
-            this.buttonGrid.addButtons(parsedData);
+            this.gridbuttonscontent.addButtons(parsedData);
             return allData;
         } catch (error) {
             console.error('Error al obtener los datos de la base de datos:', error);
@@ -265,7 +265,7 @@ class ButtonManager {
 }
 
 // Instancia y uso de la clase ButtonManager
-const buttonManager = new ButtonManager(streamcontrolsDBManager, buttonGrid);
+const buttonManager = new ButtonManager(streamcontrolsDBManager, gridbuttonscontent);
 
 // Llamada inicial para obtener y añadir datos
 buttonManager.addButtons();
@@ -315,4 +315,4 @@ getidfromvalueboard('Add').then(data => {
 });
 
 // Para activar/desactivar el modo de edición
-document.getElementById('toggleEditMode').addEventListener('click', () => buttonGrid.toggleEditMode());
+document.getElementById('toggleEditMode').addEventListener('click', () => gridbuttonscontent.toggleEditMode());
